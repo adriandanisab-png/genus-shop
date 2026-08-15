@@ -86,7 +86,7 @@ form.addEventListener('submit', async (e) => {
     showThankYou();
   } catch (err) {
     console.error('[events] booking submit failed:', err);
-    errorEl.textContent = 'Sorry — something went wrong sending your request. Please email us at hello@genuscoffee.ro.';
+    errorEl.innerHTML = 'Sorry — something went wrong. <a href="https://wa.me/40723910971" target="_blank" rel="noopener">Message us on WhatsApp</a> and we’ll sort it.';
     errorEl.hidden = false;
     submitBtn.disabled = false;
     submitBtn.textContent = 'Request a quote';

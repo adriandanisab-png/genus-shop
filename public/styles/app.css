@@ -468,3 +468,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; }
 .pe-scroll::-webkit-scrollbar { height: 10px; }
 .pe-scroll::-webkit-scrollbar-thumb { background: var(--ink-950); border-radius: 999px; }
 .pe-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Floating WhatsApp button */
+.wa-fab {
+  position: fixed; right: 20px; bottom: 20px; z-index: 60;
+  width: 56px; height: 56px; border-radius: 999px; background: #25D366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  border: var(--border-w) solid var(--ink-950); box-shadow: var(--shadow-md);
+  transition: transform 120ms ease;
+}
+.wa-fab:hover { transform: translateY(-2px) scale(1.04); color: #fff; text-decoration: none; }
+.wa-fab svg { display: block; }
+@media (max-width: 620px) { .wa-fab { right: 14px; bottom: 14px; width: 52px; height: 52px; } }
