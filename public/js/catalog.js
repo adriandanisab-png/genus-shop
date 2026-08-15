@@ -12,7 +12,10 @@ export async function getProducts() {
     try {
       const snap = await getDocs(collection(db, 'products'));
       if (!snap.empty) {
-        _cache = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        _cache = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .filter((p) => p.available !== false) // hide sold-out / hidden
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || String(a.name).localeCompare(String(b.name)));
         return _cache;
       }
     } catch (e) {

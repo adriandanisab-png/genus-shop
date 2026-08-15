@@ -10,8 +10,10 @@
  * CHECKOUT_ENDPOINT in public/js/checkout.js.
  */
 const CURRENCY = 'ron';
+const PROJECT = 'shop-genus-coffee';
 
-// Server-side price authority. KEEP IN SYNC WITH public/js/data.js.
+// Bundled price fallback (used only if a product isn't in Firestore yet).
+// KEEP IN SYNC WITH public/js/data.js.
 const PRODUCTS = {
   'el-triunfo':   { name: 'Genus Coffee — El Triunfo (Colombia Huila) 250g',        price: 79, description: 'Black tea, blackberry, chocolate' },
   'el-cerro':     { name: 'Genus Coffee — El Cerro (Costa Rica West Valley) 250g',  price: 85, description: 'Caramel, panela, baked apple' },
@@ -19,6 +21,26 @@ const PRODUCTS = {
   'masai-aa-top': { name: 'Genus Coffee — Masai AA Top (Kenya Mount Kenya) 250g',   price: 95, description: 'Blackcurrant, tropical fruit, clementine' },
   'simbi-kinazi': { name: 'Genus Coffee — Simbi Kinazi (Rwanda Huye) 250g',         price: 85, description: 'Red fruit, cinnamon, white chocolate' },
 };
+
+// Authoritative price resolver: prefer the admin-managed Firestore catalog
+// (public read), fall back to the bundled map. Refuses products the admin hid.
+async function resolveProduct(id) {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/products/${encodeURIComponent(id)}`;
+    const r = await fetch(url);
+    if (r.ok) {
+      const f = (await r.json()).fields || {};
+      const available = f.available ? f.available.booleanValue !== false : true;
+      if (!available) return null; // admin marked it unavailable → don't sell
+      const price = f.price ? Number(f.price.integerValue ?? f.price.doubleValue) : NaN;
+      if (Number.isFinite(price) && price > 0) {
+        return { name: f.name?.stringValue || id, price, description: f.originLabel?.stringValue };
+      }
+    }
+    // 404 (not in Firestore) → fall through to the bundled fallback
+  } catch (_) { /* network hiccup → fall through */ }
+  return PRODUCTS[id] || null;
+}
 
 // Browsers allowed to call this endpoint.
 const ALLOWED_ORIGINS = [
@@ -50,11 +72,12 @@ export default {
     params.set('success_url', `${successUrl}?session_id={CHECKOUT_SESSION_ID}`);
     params.set('cancel_url', cancelUrl);
     params.set('phone_number_collection[enabled]', 'true');
+    params.set('allow_promotion_codes', 'true');
     params.append('shipping_address_collection[allowed_countries][0]', 'RO');
 
     let i = 0;
     for (const it of items) {
-      const p = PRODUCTS[String(it.id)];
+      const p = await resolveProduct(String(it.id));
       if (!p) return json({ error: `Product "${it.id}" is unavailable.` }, 400, cors);
       const qty = Math.max(1, Math.min(99, parseInt(it.qty, 10) || 1));
       params.append(`line_items[${i}][quantity]`, String(qty));
