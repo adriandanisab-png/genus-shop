@@ -22,7 +22,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // Keep region in sync with FUNCTIONS_REGION in public/js/firebase.js.
-setGlobalOptions({ region: 'us-central1', maxInstances: 10 });
+setGlobalOptions({ region: 'europe-west1', maxInstances: 10 });
 
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');

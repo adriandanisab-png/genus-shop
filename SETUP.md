@@ -21,7 +21,7 @@ In the [Firebase console](https://console.firebase.google.com), on your project,
 ### a) `public/js/firebase.js`
 - **`firebaseConfig`** — copy from Firebase console → Project settings → *Your apps* → Web app → SDK setup & config. Replace every `REPLACE_…`.
 - **`ADMIN_EMAILS`** — the Google account(s) allowed into `/admin`.
-- `FUNCTIONS_REGION` — leave `us-central1` unless you deploy functions elsewhere.
+- `FUNCTIONS_REGION` — set to `europe-west1` (matches the functions). Create **Firestore in a European location too** (e.g. `europe-west1` or the `eur3` multi-region) — Firestore's location is permanent.
 
 ### b) `.firebaserc`
 Replace `REPLACE_WITH_PROJECT_ID` with your Firebase project id. (Or run `firebase use --add`.)
@@ -47,7 +47,7 @@ firebase deploy --only functions
 ```
 
 The deploy prints the **stripeWebhook** URL, e.g.
-`https://us-central1-<project>.cloudfunctions.net/stripeWebhook`
+`https://europe-west1-<project>.cloudfunctions.net/stripeWebhook`
 
 In **Stripe Dashboard → Developers → Webhooks → Add endpoint**:
 - Endpoint URL = that stripeWebhook URL

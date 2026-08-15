@@ -21,8 +21,9 @@ export const firebaseConfig = {
   measurementId: 'G-E17NQXLE7Z',
 };
 
-// Region your Cloud Functions are deployed to (Firebase default is us-central1).
-export const FUNCTIONS_REGION = 'us-central1';
+// Region your Cloud Functions are deployed to. europe-west1 keeps latency low
+// for Romanian customers; must match setGlobalOptions() in functions/index.js.
+export const FUNCTIONS_REGION = 'europe-west1';
 
 // Emails allowed into /admin. Real enforcement lives in firestore.rules — keep
 // these two lists in sync.
