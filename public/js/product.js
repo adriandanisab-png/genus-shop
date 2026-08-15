@@ -41,10 +41,7 @@ const id = new URLSearchParams(location.search).get('id');
             <span class="qty__val" data-qty-value>1</span>
             <button class="qty__btn" data-step="1" type="button" aria-label="Increase quantity">${icon('plus', 14)}</button>
           </div>
-          <button class="btn btn--secondary btn--lg" id="add" type="button">${icon('shopping-bag', 16)} Add to cart</button>
-          ${p.stripeLink
-            ? `<a class="btn btn--primary btn--lg" href="${escapeHtml(p.stripeLink)}">Buy now</a>`
-            : `<button class="btn btn--primary btn--lg" id="buy-missing" type="button">Buy now</button>`}
+          <button class="btn btn--primary btn--lg" id="add" type="button">${icon('shopping-bag', 16)} Add to cart</button>
         </div>
         <div id="pd-acc"></div>
       </div>
@@ -64,9 +61,6 @@ const id = new URLSearchParams(location.search).get('id');
     addToCart(p.id, qty);
     toast(qty > 1 ? `Added ${qty} to cart` : 'Added to cart');
   });
-
-  const buyMissing = root.querySelector('#buy-missing');
-  if (buyMissing) buyMissing.addEventListener('click', () => toast('Payment link not set yet — see SETUP.md'));
 
   // Accordion
   const acc = root.querySelector('#pd-acc');

@@ -10,38 +10,31 @@ export function formatMoney(amount) {
   return new Intl.NumberFormat('ro-RO').format(amount) + ' ' + CURRENCY_LABEL;
 }
 
-// `stripeLink`: paste each bag's Stripe Payment Link URL (SETUP.md → Payments).
-// Empty = "Buy" shows a "not connected yet" notice instead of opening Stripe.
 export const PRODUCTS = [
   {
     id: 'el-triunfo', origin: 'colombia', originLabel: 'Colombia · Huila', name: 'El Triunfo',
     region: '1750m · Washed', notes: 'Black tea, blackberry, chocolate', price: 79,
     image: 'assets/reference/packaging-colombia.jpg', weight: '250g', roast: 'Omniroast',
-    stripeLink: 'https://buy.stripe.com/test_28E3cv98QaBa9YeexidAk00',
   },
   {
     id: 'el-cerro', origin: 'costarica', originLabel: 'Costa Rica · West Valley', name: 'El Cerro',
     region: '1200–1900m · Yellow honey', notes: 'Caramel, panela, baked apple', price: 85,
     image: 'assets/reference/packaging-costarica.jpg', weight: '250g', roast: 'Omniroast',
-    stripeLink: 'https://buy.stripe.com/test_14AfZh3Ow24E9YedtedAk01',
   },
   {
     id: 'guji-uraga', origin: 'ethiopia', originLabel: 'Ethiopia · Guji', name: 'Guji Uraga',
     region: '1900–2300m · Anaerobic natural', notes: 'Tropical fruit, citrus, intense sweetness', price: 89,
     image: 'assets/reference/packaging-ethiopia.jpg', weight: '250g', roast: 'Omniroast',
-    stripeLink: 'https://buy.stripe.com/test_fZubJ10Ck38Ifiy4WIdAk02',
   },
   {
     id: 'masai-aa-top', origin: 'kenya', originLabel: 'Kenya · Mount Kenya', name: 'Masai AA Top',
     region: '1500–2100m · Washed', notes: 'Blackcurrant, tropical fruit, clementine', price: 95,
     image: 'assets/reference/packaging-kenya.jpg', weight: '250g', roast: 'Omniroast',
-    stripeLink: 'https://buy.stripe.com/test_4gMcN55WE7oYgmC88UdAk03',
   },
   {
     id: 'simbi-kinazi', origin: 'rwanda', originLabel: 'Rwanda · Huye', name: 'Simbi Kinazi',
     region: '1700–2000m · Honey', notes: 'Red fruit, cinnamon, white chocolate', price: 85,
     image: 'assets/reference/packaging-blank-rwanda.jpg', weight: '250g', roast: 'Omniroast',
-    stripeLink: 'https://buy.stripe.com/test_aFa6oHfxe6kU2vM4WIdAk04',
   },
 ];
 

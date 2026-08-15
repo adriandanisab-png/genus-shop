@@ -1,8 +1,9 @@
-import { renderChrome, escapeHtml, originClass, toast } from './components.js';
+import { renderChrome, escapeHtml, originClass } from './components.js';
 import { icon } from './icons.js';
 import { getProducts } from './catalog.js';
 import { getCart, setQty, removeFromCart, clearCart } from './cart.js';
 import { formatMoney } from './data.js';
+import { startCheckout } from './checkout.js';
 
 renderChrome();
 
@@ -25,12 +26,6 @@ function emptyHTML() {
   </div>`;
 }
 
-function buyControl(i) {
-  return i.stripeLink
-    ? `<a class="btn btn--primary btn--sm" href="${escapeHtml(i.stripeLink)}">Buy</a>`
-    : `<button class="btn btn--primary btn--sm" data-buy-missing type="button">Buy</button>`;
-}
-
 function lineHTML(i) {
   return `
   <div class="cart-line" data-id="${escapeHtml(i.id)}">
@@ -47,7 +42,6 @@ function lineHTML(i) {
         <button class="qty__btn" data-step="1" type="button" aria-label="Increase">${icon('plus', 14)}</button>
       </div>
       <span class="cart-line__price">${formatMoney(i.price * i.qty)}</span>
-      ${buyControl(i)}
       <button class="cart-remove" data-remove type="button" aria-label="Remove ${escapeHtml(i.name)}">${icon('trash-2', 14)} Remove</button>
     </div>
   </div>`;
@@ -64,12 +58,25 @@ function render() {
     <div class="cart-grid">
       <div class="cart-lines">${items.map(lineHTML).join('')}</div>
       <div class="cart-summary panel">
-        <div class="cart-summary__row"><span>Subtotal (est.)</span><span class="mono">${formatMoney(subtotal)}</span></div>
+        <div class="cart-summary__row"><span>Subtotal</span><span class="mono">${formatMoney(subtotal)}</span></div>
         <div class="cart-summary__row"><span>Shipping</span><span style="color:var(--text-secondary)">Calculated at checkout</span></div>
-        <div class="notice" style="margin-top:8px">Each bag checks out on its own secure Stripe page — press <strong>Buy</strong> on an item, and set the final quantity there.</div>
+        <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span>${formatMoney(subtotal)}</span></div>
+        <button class="btn btn--primary btn--lg btn--block" id="checkout" type="button" style="margin-top:8px">Checkout</button>
+        <div class="notice" id="checkout-note" hidden style="margin-top:4px"></div>
         <button class="btn btn--ghost btn--sm" id="clear" type="button">Clear cart</button>
       </div>
     </div>`;
+}
+
+async function doCheckout() {
+  const note = document.getElementById('checkout-note');
+  const btn = document.getElementById('checkout');
+  if (note) note.hidden = true;
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting checkout…'; }
+  await startCheckout((msg) => {
+    if (note) { note.textContent = msg; note.hidden = false; }
+  });
+  if (btn) { btn.disabled = false; btn.textContent = 'Checkout'; }
 }
 
 // Delegated handlers (root persists across re-renders)
@@ -83,8 +90,8 @@ root.addEventListener('click', (e) => {
     setQty(id, cur + Number(step.dataset.step));
   } else if (rem && line) {
     removeFromCart(line.dataset.id);
-  } else if (e.target.closest('[data-buy-missing]')) {
-    toast('Payment link not set yet — see SETUP.md');
+  } else if (e.target.closest('#checkout')) {
+    doCheckout();
   } else if (e.target.closest('#clear')) {
     clearCart();
   }

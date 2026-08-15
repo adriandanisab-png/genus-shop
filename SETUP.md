@@ -1,80 +1,83 @@
-# Setup & deploy — Genus Coffee (Spark / free plan)
+# Setup & deploy — Genus Coffee
 
-The site is already wired to your Firebase project **`shop-genus-coffee`**. No billing/Blaze is required — the shop checks out via **Stripe Payment Links**, and event bookings save to Firestore (free tier). ~15 minutes to go live.
+The site is wired to your Firebase project **`shop-genus-coffee`** (config, admin
+allow-list, region `europe-west1`). Firestore is enabled. What's left is to turn
+on Cloud Functions (Blaze), give Stripe its keys, and deploy. ~15 minutes.
+
+Checkout is **whole-basket**: the cart calls the `createCheckoutSession` Cloud
+Function, which builds one Stripe Checkout Session for every item at once.
 
 ## 0. Prerequisites
 
-- **Firebase CLI**: `npm install -g firebase-tools` then `firebase login` (already logged in as `orange10verde10@gmail.com` on this machine)
-- A **Stripe account** (test mode is fine to start)
-- Node.js 20+ (only needed for the optional product seed)
+- **Firebase CLI** (already logged in as `orange10verde10@gmail.com` on this machine)
+- Your **Stripe secret key** — the same `sk_test_…` you used to make the Payment Links (Dashboard → Developers → API keys). *(The old Payment Links are no longer used and can be archived in Stripe.)*
+- Node 20+ (for `functions/` install)
 
-## 1. Enable two services in the [Firebase console](https://console.firebase.google.com/project/shop-genus-coffee)
+## 1. Two things in the console
 
-1. **Firestore Database → Create database → production mode → location `europe-west1`** (or the `eur3` multi-region). ⚠️ Permanent — pick Europe. Powers the event-booking inbox.
-2. **Authentication → Sign-in method → Google → Enable.** Lets you (and only allow-listed emails) into `/admin`.
+1. **Upgrade the project to the [Blaze plan](https://console.firebase.google.com/project/shop-genus-coffee/usage/details)** — Cloud Functions require it. Realistically ~€0/mo at your volume; set a budget alert if you like.
+2. **Authentication → Sign-in method → Google → Enable** (only needed for `/admin`).
 
-That's it — **no Blaze plan needed.**
+*(Firestore is already enabled — ✓.)*
 
-> Already set for you: Firebase config, project id, and the admin allow-list
-> (`adrian.danisab@gmail.com`, `orange10verde10@gmail.com`) in `public/js/firebase.js`
-> and `firestore.rules`. Edit those two (keep them in sync) to change admins.
+## 2. Stripe key + deploy the functions
 
-## 2. Create the shop's Stripe Payment Links
+```bash
+cd ~/genus-coffee/functions
+npm install
 
-In **Stripe Dashboard → Payment Links → + New link**, create **one link per bag** (5 total). For each:
+# your Stripe secret key
+firebase functions:secrets:set STRIPE_SECRET_KEY        # paste sk_test_...
 
-- **Product**: name it to match, set the price in **RON** (matching `public/js/data.js`):
-  El Triunfo 79 · El Cerro 85 · Guji Uraga 89 · Masai AA Top 95 · Simbi Kinazi 85 lei
-- Turn on **"Let customers adjust quantity"**
-- Turn on **Collect shipping address** (Romania)
-- *(Optional, nicer UX)* After payment → **Redirect to your page** →
-  `https://shop-genus-coffee.web.app/success.html?id=<productId>`
-  where `<productId>` is the `id` in data.js (`el-triunfo`, `el-cerro`, `guji-uraga`, `masai-aa-top`, `simbi-kinazi`). The `?id=` lets the site drop that bag from the cart on return.
-
-Copy each link's URL into the matching product's **`stripeLink`** in `public/js/data.js`:
-
-```js
-{ id: 'el-triunfo', …, stripeLink: 'https://buy.stripe.com/xxxxxxxx' },
+# deploy so the webhook URL exists
+firebase deploy --only functions
 ```
 
-Until a `stripeLink` is filled, that product's **Buy** button shows a "not connected yet" notice.
+The deploy prints the **stripeWebhook** URL, e.g.
+`https://europe-west1-shop-genus-coffee.cloudfunctions.net/stripeWebhook`
 
-## 3. Deploy
+## 3. Point Stripe's webhook at it
+
+In **Stripe Dashboard → Developers → Webhooks → Add endpoint**:
+- URL = that `stripeWebhook` URL
+- Event = **`checkout.session.completed`**
+- Save, **Reveal** the signing secret (`whsec_…`), then:
+
+```bash
+firebase functions:secrets:set STRIPE_WEBHOOK_SECRET    # paste whsec_...
+firebase deploy --only functions:stripeWebhook
+```
+
+## 4. Deploy rules + site
 
 ```bash
 cd ~/genus-coffee
 firebase deploy --only firestore:rules,hosting
 ```
 
-Live at **https://shop-genus-coffee.web.app**. Sign in at `/admin.html` with an allow-listed Google account to see event bookings.
+Live at **https://shop-genus-coffee.web.app**. Test a basket checkout with card
+`4242 4242 4242 4242` (any future date / any CVC); the order should appear in
+`/admin` → Orders, and in your Stripe Dashboard.
 
-## 4. (Optional) Seed the product catalog into Firestore
+## 5. (Optional) Seed the catalog into Firestore
 
-The shop reads from `public/js/data.js` by default, so this is optional — do it only if you want to manage the catalog from Firestore later:
+Not required — the shop reads `js/data.js` and checkout has a server-side price
+fallback. Do it only to manage the catalog from Firestore later:
 
 ```bash
-cd ~/genus-coffee/scripts
-npm install
-gcloud auth application-default login     # or export GOOGLE_APPLICATION_CREDENTIALS=…serviceAccount.json
+cd ~/genus-coffee/scripts && npm install
+gcloud auth application-default login
 node seed-products.js shop-genus-coffee
 ```
 
-## Where orders show up
-
-Payment Links are hosted by Stripe, so **orders live in your [Stripe Dashboard](https://dashboard.stripe.com/payments)** (customer, items, shipping, payment status). The `/admin` "Shop orders" tab links straight there. Event **bookings** are in `/admin` (from Firestore).
-
 ## Going live (real payments)
 
-1. Recreate the 5 Payment Links in Stripe **live mode** (or toggle the account live).
-2. Replace the `stripeLink` URLs in `data.js` with the live `https://buy.stripe.com/…` links.
-3. `firebase deploy --only hosting`.
-
-## If you outgrow Payment Links
-
-Want a true multi-item cart (pay for several bags at once) with orders auto-recorded into `/admin`? That needs a small backend, which on Firebase means **Cloud Functions + the Blaze plan**. Say the word and I'll add it back (the earlier function code is in git history).
+1. Set `STRIPE_SECRET_KEY` to your **live** `sk_live_…` and redeploy functions.
+2. Add a **live-mode** webhook endpoint (same URL + event), set `STRIPE_WEBHOOK_SECRET` to its `whsec_…`, redeploy `stripeWebhook`.
 
 ## Common gotchas
 
-- **"Buy" shows "not connected yet"** → that product's `stripeLink` is still empty in `data.js`.
-- **Booking form errors** → Firestore isn't enabled yet (step 1), or rules aren't deployed (step 3).
-- **`/admin` says "no access"** → your Google email isn't in *both* `ADMIN_EMAILS` and `firestore.rules`.
+- **Functions won't deploy** → project isn't on Blaze yet (step 1).
+- **Checkout button errors** → `STRIPE_SECRET_KEY` not set, or functions not deployed.
+- **Webhook 400s in Stripe** → `STRIPE_WEBHOOK_SECRET` doesn't match the endpoint; reset and redeploy `stripeWebhook`.
+- **`/admin` says "no access"** → your Google email isn't in *both* `ADMIN_EMAILS` (js/firebase.js) and `firestore.rules`.
