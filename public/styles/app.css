@@ -333,3 +333,6 @@
 .signin-card { max-width: 420px; margin: 60px auto; text-align: center; }
 .signin-card h1 { font-family: var(--font-display); font-size: 1.75rem; margin-bottom: 10px; }
 .signin-card p { color: var(--text-secondary); margin-bottom: 24px; }
+
+/* Spark / Payment Links: cart line right cluster can hold a Buy button too. */
+.cart-line__right { flex-wrap: wrap; justify-content: flex-end; }

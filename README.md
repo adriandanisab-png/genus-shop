@@ -1,8 +1,8 @@
 # Genus Coffee — shop & event booking
 
-Marketing site, single-origin **shop** (Stripe checkout), and a **coffee-cart event-booking** flow for Genus Coffee, a Bucureşti specialty roaster.
+Marketing site, single-origin **shop** (Stripe Payment Links), and a **coffee-cart event-booking** flow for Genus Coffee, a Bucureşti specialty roaster.
 
-Plain HTML + vanilla JS (ES modules, no build step) on **Firebase Hosting**, with **Firestore** for data and **Cloud Functions** for Stripe. Built to the [Genus Coffee Design System](#).
+Plain HTML + vanilla JS (ES modules, no build step) on **Firebase Hosting**, with **Firestore** for event bookings. Runs entirely on the **free Spark plan** — no Cloud Functions, no billing. Built to the Genus Coffee Design System.
 
 ## Pages
 
@@ -10,23 +10,24 @@ Plain HTML + vanilla JS (ES modules, no build step) on **Firebase Hosting**, wit
 |------|------|--------------|
 | Home | `public/index.html` | Hero, featured single-origins, events band |
 | Shop | `public/shop.html` | Product grid with origin filter |
-| Product | `public/product.html?id=…` | Single bag, quantity, add to cart |
+| Product | `public/product.html?id=…` | Single bag, add to cart, **Buy now** → Stripe |
 | Events | `public/events.html` | Cart-hire packages + quote-request form → Firestore |
-| Cart | `public/cart.html` | Line items → Stripe Checkout |
-| Success / Cancel | `public/success.html`, `cancel.html` | Post-payment |
-| Admin | `public/admin.html` | Google sign-in (allow-listed) → live orders & bookings |
+| Cart | `public/cart.html` | Saved bags; **Buy** each via its Stripe Payment Link |
+| Success | `public/success.html` | Post-payment landing (Payment Link redirect target) |
+| Admin | `public/admin.html` | Google sign-in (allow-listed) → live event bookings |
 
 ## Data model (Firestore)
 
-- **products** — catalog (public read; admin write). Optional: checkout has a server-side price fallback, so this can be empty at launch.
+- **products** — optional catalog (public read; admin write). The shop falls back to `js/data.js`, so this can stay empty.
 - **bookings** — event quote requests (public create; admin read/manage).
-- **orders** — written by the Stripe webhook only (admin read).
+
+Shop **orders** are handled by Stripe (Payment Links) and live in the **Stripe Dashboard**, not Firestore.
 
 ## Architecture notes
 
-- **No build step.** Pages are static HTML; each loads one ES module from `public/js/`. Shared chrome (nav/footer), cards, and the accordion are rendered by `js/components.js`; icons are inline SVG in `js/icons.js` (no icon CDN).
-- **Demo mode.** Until you paste Firebase keys into `public/js/firebase.js`, the site runs fully on local data (`js/data.js`): browsing and cart work; checkout and booking submit show a friendly "not configured yet" notice instead of failing.
-- **Price integrity.** The cart only ever sends `{id, qty}`. The `createCheckoutSession` Cloud Function looks up authoritative prices server-side — clients can't set prices.
+- **No build step, no backend.** Static HTML; each page loads one ES module from `public/js/`. Shared chrome (nav/footer), cards, and the accordion render from `js/components.js`; icons are inline SVG in `js/icons.js`.
+- **Checkout = Stripe Payment Links.** Each product has a `stripeLink` in `js/data.js`; "Buy" opens Stripe's hosted page. No server, so it runs on the free plan — see `SETUP.md`.
+- **Demo mode.** Until Firebase keys are present (they are, for `shop-genus-coffee`) and a `stripeLink` is set, the site runs on local data and shows friendly "not connected yet" notices instead of failing.
 
 ## Local development
 
@@ -35,12 +36,10 @@ python3 -m http.server 5055 --directory public
 # open http://localhost:5055
 ```
 
-or, with the Firebase CLI installed: `firebase emulators:start`.
-
 ## Deploy
 
-See **[SETUP.md](SETUP.md)** for the full walkthrough (Firebase project, Stripe keys, admin email, deploy commands).
+See **[SETUP.md](SETUP.md)** (enable Firestore + Google auth, create Payment Links, deploy).
 
 ```bash
-firebase deploy
+firebase deploy --only firestore:rules,hosting
 ```

@@ -14,7 +14,6 @@ const emailEl = document.getElementById('admin-email');
 
 const BOOKING_STATUSES = ['new', 'contacted', 'booked', 'declined'];
 
-let orders = [];
 let bookings = [];
 let tab = 'bookings';
 let subscribed = false;
@@ -82,11 +81,6 @@ function subscribe() {
     bookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     if (tab === 'bookings') renderPanel();
   }, (err) => console.error('[admin] bookings listen failed', err));
-
-  onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snap) => {
-    orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    if (tab === 'orders') renderPanel();
-  }, (err) => console.error('[admin] orders listen failed', err));
 }
 
 // Booking status change (delegated)
@@ -105,11 +99,6 @@ function fmtDate(ts) {
   }
   return '—';
 }
-function fmtMinor(amount, currency) {
-  if (amount == null) return '—';
-  const label = currency === 'ron' ? 'lei' : String(currency || '').toUpperCase();
-  return new Intl.NumberFormat('ro-RO').format(amount / 100) + ' ' + label;
-}
 function statusPill(status) {
   const s = escapeHtml(status || 'new');
   return `<span class="status-pill status-${s}">${s}</span>`;
@@ -121,9 +110,13 @@ function renderPanel() {
       ? bookings.map(bookingHTML).join('')
       : `<p class="empty-state">No event bookings yet.</p>`;
   } else {
-    panel.innerHTML = orders.length
-      ? orders.map(orderHTML).join('')
-      : `<p class="empty-state">No orders yet.</p>`;
+    panel.innerHTML = `<div class="panel">
+      <h3 style="font-family:var(--font-display); font-size:20px; margin-bottom:10px">Orders live in Stripe</h3>
+      <p style="color:var(--text-secondary); line-height:var(--leading-relaxed); margin-bottom:18px">
+        Shop payments run through Stripe Payment Links, so every order — customer, items, shipping and payment status — is in your Stripe Dashboard.
+      </p>
+      <a class="btn btn--primary" href="https://dashboard.stripe.com/payments" target="_blank" rel="noopener">Open Stripe payments →</a>
+    </div>`;
   }
 }
 
@@ -152,24 +145,3 @@ function bookingHTML(b) {
   </div>`;
 }
 
-function orderHTML(o) {
-  const items = (o.items || [])
-    .map((li) => `${escapeHtml(String(li.quantity))}× ${escapeHtml(li.description || '')}`)
-    .join('<br>') || '—';
-  const ship = o.shipping && o.shipping.address
-    ? escapeHtml([o.shipping.address.line1, o.shipping.address.city, o.shipping.address.postal_code, o.shipping.address.country].filter(Boolean).join(', '))
-    : '—';
-  return `
-  <div class="record">
-    <div class="record__head">
-      <div class="record__title">${escapeHtml(o.name || o.email || 'Order')} · ${fmtMinor(o.amountTotal, o.currency)}</div>
-      <div class="record__meta">${fmtDate(o.createdAt)} &nbsp;·&nbsp; ${statusPill(o.status || 'paid')}</div>
-    </div>
-    <dl>
-      <dt>Email</dt><dd><a href="mailto:${escapeHtml(o.email || '')}">${escapeHtml(o.email || '—')}</a></dd>
-      <dt>Phone</dt><dd>${escapeHtml(o.phone || '—')}</dd>
-      <dt>Items</dt><dd>${items}</dd>
-      <dt>Ship to</dt><dd>${ship}</dd>
-    </dl>
-  </div>`;
-}

@@ -1,113 +1,80 @@
-# Setup & deploy — Genus Coffee
+# Setup & deploy — Genus Coffee (Spark / free plan)
 
-Everything is built. To go live you need to (1) create a Firebase project, (2) paste keys into a few files, (3) wire Stripe, (4) deploy. ~20 minutes.
+The site is already wired to your Firebase project **`shop-genus-coffee`**. No billing/Blaze is required — the shop checks out via **Stripe Payment Links**, and event bookings save to Firestore (free tier). ~15 minutes to go live.
 
 ## 0. Prerequisites
 
-- **Node.js 20+**
-- **Firebase CLI**: `npm install -g firebase-tools` then `firebase login`
-- A **Firebase project** on the **Blaze (pay-as-you-go)** plan — Cloud Functions require Blaze. (Costs are ~zero at low volume.)
-- A **Stripe account** (test mode is fine to start).
+- **Firebase CLI**: `npm install -g firebase-tools` then `firebase login` (already logged in as `orange10verde10@gmail.com` on this machine)
+- A **Stripe account** (test mode is fine to start)
+- Node.js 20+ (only needed for the optional product seed)
 
-In the [Firebase console](https://console.firebase.google.com), on your project, enable:
-- **Build → Firestore Database** (create database, production mode)
-- **Build → Authentication → Sign-in method → Google** (enable)
-- **Build → Hosting** and **Build → Functions**
+## 1. Enable two services in the [Firebase console](https://console.firebase.google.com/project/shop-genus-coffee)
 
----
+1. **Firestore Database → Create database → production mode → location `europe-west1`** (or the `eur3` multi-region). ⚠️ Permanent — pick Europe. Powers the event-booking inbox.
+2. **Authentication → Sign-in method → Google → Enable.** Lets you (and only allow-listed emails) into `/admin`.
 
-## 1. Paste your keys (4 edits)
+That's it — **no Blaze plan needed.**
 
-### a) `public/js/firebase.js`
-- **`firebaseConfig`** — copy from Firebase console → Project settings → *Your apps* → Web app → SDK setup & config. Replace every `REPLACE_…`.
-- **`ADMIN_EMAILS`** — the Google account(s) allowed into `/admin`.
-- `FUNCTIONS_REGION` — set to `europe-west1` (matches the functions). Create **Firestore in a European location too** (e.g. `europe-west1` or the `eur3` multi-region) — Firestore's location is permanent.
+> Already set for you: Firebase config, project id, and the admin allow-list
+> (`adrian.danisab@gmail.com`, `orange10verde10@gmail.com`) in `public/js/firebase.js`
+> and `firestore.rules`. Edit those two (keep them in sync) to change admins.
 
-### b) `.firebaserc`
-Replace `REPLACE_WITH_PROJECT_ID` with your Firebase project id. (Or run `firebase use --add`.)
+## 2. Create the shop's Stripe Payment Links
 
-### c) `firestore.rules`
-Replace `REPLACE_WITH_ADMIN_EMAIL@example.com` with the **same** admin email(s) as `ADMIN_EMAILS`. This is the real security boundary for the admin data.
+In **Stripe Dashboard → Payment Links → + New link**, create **one link per bag** (5 total). For each:
 
-> Currency is **RON (lei)**, set in `public/js/data.js` (`CURRENCY`) and `functions/index.js` (`CURRENCY`). Change both if you sell in EUR/USD.
+- **Product**: name it to match, set the price in **RON** (matching `public/js/data.js`):
+  El Triunfo 79 · El Cerro 85 · Guji Uraga 89 · Masai AA Top 95 · Simbi Kinazi 85 lei
+- Turn on **"Let customers adjust quantity"**
+- Turn on **Collect shipping address** (Romania)
+- *(Optional, nicer UX)* After payment → **Redirect to your page** →
+  `https://shop-genus-coffee.web.app/success.html?id=<productId>`
+  where `<productId>` is the `id` in data.js (`el-triunfo`, `el-cerro`, `guji-uraga`, `masai-aa-top`, `simbi-kinazi`). The `?id=` lets the site drop that bag from the cart on return.
 
----
+Copy each link's URL into the matching product's **`stripeLink`** in `public/js/data.js`:
 
-## 2. Wire Stripe (functions)
-
-```bash
-cd functions
-npm install
-
-# 1) your Stripe secret key (Dashboard → Developers → API keys)
-firebase functions:secrets:set STRIPE_SECRET_KEY      # paste sk_test_...
-
-# 2) deploy the functions so the webhook URL exists
-firebase deploy --only functions
+```js
+{ id: 'el-triunfo', …, stripeLink: 'https://buy.stripe.com/xxxxxxxx' },
 ```
 
-The deploy prints the **stripeWebhook** URL, e.g.
-`https://europe-west1-<project>.cloudfunctions.net/stripeWebhook`
+Until a `stripeLink` is filled, that product's **Buy** button shows a "not connected yet" notice.
 
-In **Stripe Dashboard → Developers → Webhooks → Add endpoint**:
-- Endpoint URL = that stripeWebhook URL
-- Events to send = **`checkout.session.completed`**
-- Save, then **Reveal** the *Signing secret* (`whsec_...`)
+## 3. Deploy
 
 ```bash
-# 3) store the signing secret and redeploy the webhook to pick it up
-firebase functions:secrets:set STRIPE_WEBHOOK_SECRET  # paste whsec_...
-firebase deploy --only functions:stripeWebhook
+cd ~/genus-coffee
+firebase deploy --only firestore:rules,hosting
 ```
 
----
-
-## 3. Deploy rules + site
-
-```bash
-firebase deploy --only firestore:rules
-firebase deploy --only hosting
-# or everything at once:
-firebase deploy
-```
-
-Your site is live at `https://<project>.web.app`. Sign in at `/admin.html` with an allow-listed Google account.
-
----
+Live at **https://shop-genus-coffee.web.app**. Sign in at `/admin.html` with an allow-listed Google account to see event bookings.
 
 ## 4. (Optional) Seed the product catalog into Firestore
 
-Checkout already works via a server-side price fallback in `functions/index.js`. Seed Firestore only if you want the catalog stored there (to edit later):
+The shop reads from `public/js/data.js` by default, so this is optional — do it only if you want to manage the catalog from Firestore later:
 
 ```bash
-cd scripts
+cd ~/genus-coffee/scripts
 npm install
 gcloud auth application-default login     # or export GOOGLE_APPLICATION_CREDENTIALS=…serviceAccount.json
-node seed-products.js <your-project-id>
+node seed-products.js shop-genus-coffee
 ```
 
----
+## Where orders show up
 
-## Going to production with Stripe
+Payment Links are hosted by Stripe, so **orders live in your [Stripe Dashboard](https://dashboard.stripe.com/payments)** (customer, items, shipping, payment status). The `/admin` "Shop orders" tab links straight there. Event **bookings** are in `/admin` (from Firestore).
 
-1. Toggle Stripe to **live mode**, grab the live `sk_live_…` key and set `STRIPE_SECRET_KEY` again.
-2. Create a **live** webhook endpoint (same URL, same event) and set `STRIPE_WEBHOOK_SECRET` to its `whsec_…`.
-3. `firebase deploy --only functions`.
+## Going live (real payments)
 
-## Where things live
+1. Recreate the 5 Payment Links in Stripe **live mode** (or toggle the account live).
+2. Replace the `stripeLink` URLs in `data.js` with the live `https://buy.stripe.com/…` links.
+3. `firebase deploy --only hosting`.
 
-```
-public/            → Firebase Hosting (the site)
-  js/firebase.js   → your Firebase config + admin allow-list  ← EDIT
-  js/data.js       → catalog, prices, packages, FAQ, currency ← EDIT copy
-functions/index.js → Stripe checkout + order webhook
-firestore.rules    → security (admin email)                  ← EDIT
-.firebaserc        → project id                              ← EDIT
-```
+## If you outgrow Payment Links
+
+Want a true multi-item cart (pay for several bags at once) with orders auto-recorded into `/admin`? That needs a small backend, which on Firebase means **Cloud Functions + the Blaze plan**. Say the word and I'll add it back (the earlier function code is in git history).
 
 ## Common gotchas
 
-- **Checkout says "not connected"** → `firebaseConfig` still has `REPLACE_…` values.
-- **`/admin` says "no access"** → the signed-in email isn't in *both* `ADMIN_EMAILS` and `firestore.rules`.
-- **Webhook 400s in Stripe** → `STRIPE_WEBHOOK_SECRET` doesn't match the endpoint; reset it and redeploy `stripeWebhook`.
-- **Functions won't deploy** → project isn't on the Blaze plan.
+- **"Buy" shows "not connected yet"** → that product's `stripeLink` is still empty in `data.js`.
+- **Booking form errors** → Firestore isn't enabled yet (step 1), or rules aren't deployed (step 3).
+- **`/admin` says "no access"** → your Google email isn't in *both* `ADMIN_EMAILS` and `firestore.rules`.
