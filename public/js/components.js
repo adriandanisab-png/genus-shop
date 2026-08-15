@@ -23,6 +23,7 @@ export function renderChrome(active) {
         <a class="nav__brand" href="index.html">Genus</a>
         <div class="nav__links">
           <a class="nav__link${active === 'shop' ? ' is-active' : ''}" href="shop.html">Shop</a>
+          <a class="nav__link${active === 'subscribe' ? ' is-active' : ''}" href="subscribe.html">Subscribe</a>
           <a class="nav__link${active === 'events' ? ' is-active' : ''}" href="events.html">Events</a>
         </div>
         <a class="nav__cart" href="cart.html" aria-label="Cart">
@@ -49,7 +50,7 @@ function footerHTML() {
         <div class="footer__col">
           <span class="footer__head">Shop</span>
           <a href="shop.html">Single origin</a>
-          <a href="shop.html">Gear</a>
+          <a href="subscribe.html">Subscription</a>
         </div>
         <div class="footer__col">
           <span class="footer__head">Events</span>

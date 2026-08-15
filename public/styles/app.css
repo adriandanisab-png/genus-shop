@@ -362,3 +362,9 @@
   .product-row__thumb { width: 44px; height: 44px; }
   .product-row__price, .product-row__actions { grid-column: 2; justify-self: start; }
 }
+
+/* Subscription / order status pills (Stripe statuses) */
+.status-active, .status-paid, .status-complete { color: var(--olive-700); background: color-mix(in oklch, var(--olive-600) 16%, var(--paper-100)); }
+.status-trialing { color: var(--gold-700); background: color-mix(in oklch, var(--gold-500) 16%, var(--paper-100)); }
+.status-past_due, .status-unpaid { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in oklch, var(--accent) 40%, transparent); }
+.status-canceled, .status-incomplete, .status-incomplete_expired { color: var(--text-tertiary); background: var(--surface-sunken); }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coffee subscription — Genus Coffee</title>
+  <meta name="description" content="Fresh single-origin coffee delivered every month. Pause or cancel anytime.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main>
+    <section class="hero-dark">
+      <div class="eyebrow">Coffee subscription</div>
+      <h1 style="font-size:clamp(2.2rem,5.5vw,3.25rem)">Fresh coffee, every month.</h1>
+      <p>Pick a plan — we roast to order and ship it to your door. Pause or cancel anytime.</p>
+    </section>
+
+    <section class="container section">
+      <div class="grid-2" id="plans"></div>
+      <div class="notice" id="subscribe-note" hidden style="max-width:560px;margin:24px auto 0"></div>
+      <p class="link-quiet" style="text-align:center;margin-top:32px">
+        Billed monthly via Stripe. Manage or cancel anytime from the link in your receipt email.
+      </p>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/subscribe.js"></script>
+</body>
+</html>

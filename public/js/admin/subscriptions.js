@@ -1,13 +1,38 @@
-// Admin › Subscriptions — interim placeholder. The recurring-delivery flow +
-// subscriber list lands in a dedicated phase.
+// Admin › Subscriptions — active/past subscriptions from Stripe via the Worker.
+import { escapeHtml } from '../components.js';
+import { adminFetch, fmtUnix, fmtMinor } from './api.js';
+import { errBox } from './orders.js';
+
 export async function render(panel) {
+  panel.innerHTML = '<p class="empty-state">Loading subscriptions…</p>';
+  let data;
+  try { data = await adminFetch('/subscriptions'); }
+  catch (e) { panel.innerHTML = errBox('subscriptions', e.message); return; }
+
+  const subs = data.subs || [];
   panel.innerHTML = `
-  <div class="panel">
-    <h3 style="font-family:var(--font-display);font-size:20px;margin-bottom:10px">Subscriptions</h3>
-    <p style="color:var(--text-secondary);line-height:var(--leading-relaxed);margin-bottom:18px">
-      Recurring coffee delivery — subscribe flow, customer portal and a subscriber list —
-      is being built in a dedicated update.
-    </p>
-    <a class="btn btn--secondary" href="https://dashboard.stripe.com/test/subscriptions" target="_blank" rel="noopener">Subscriptions in Stripe →</a>
+    <div class="admin-toolbar">
+      <button class="btn btn--secondary btn--sm" data-refresh type="button">Refresh</button>
+      <span class="link-quiet">${subs.length} subscription${subs.length === 1 ? '' : 's'}</span>
+      <a class="link-quiet" href="https://dashboard.stripe.com/test/subscriptions" target="_blank" rel="noopener" style="margin-left:auto">Manage in Stripe →</a>
+    </div>
+    ${subs.length ? subs.map(rowHTML).join('')
+      : '<p class="empty-state">No subscriptions yet. Share <strong>/subscribe.html</strong> with customers.</p>'}`;
+  panel.querySelector('[data-refresh]').onclick = () => render(panel);
+}
+
+function rowHTML(s) {
+  const price = s.amount != null ? `${fmtMinor(s.amount, 'ron')}${s.interval ? '/' + escapeHtml(s.interval) : ''}` : '—';
+  return `
+  <div class="record">
+    <div class="record__head">
+      <div class="record__title">${escapeHtml(s.name || s.email || 'Subscriber')} · ${price}</div>
+      <div class="record__meta"><span class="status-pill status-${escapeHtml(s.status || 'active')}">${escapeHtml(s.status || 'active')}</span></div>
+    </div>
+    <dl>
+      <dt>Email</dt><dd><a href="mailto:${escapeHtml(s.email || '')}">${escapeHtml(s.email || '—')}</a></dd>
+      <dt>Started</dt><dd>${fmtUnix(s.created)}</dd>
+      <dt>Renews</dt><dd>${fmtUnix(s.currentPeriodEnd)}</dd>
+    </dl>
   </div>`;
 }

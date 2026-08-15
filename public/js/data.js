@@ -43,6 +43,20 @@ export const FEATURED_IDS = ['guji-uraga', 'el-cerro', 'masai-aa-top'];
 
 export const ORIGIN_FILTERS = ['All', 'Colombia', 'Costa Rica', 'Ethiopia', 'Kenya', 'Rwanda'];
 
+// Subscription plans — KEEP IN SYNC with SUBSCRIPTION_PLANS in worker/src/index.js
+export const SUBSCRIPTION_PLANS = [
+  {
+    id: 'monthly-1', title: 'Monthly · 1 bag', price: 79, interval: 'month',
+    description: 'One 250g single-origin bag — our pick of the month — roasted to order and shipped.',
+    details: ['Free shipping in Romania', 'Barista’s choice', 'Pause or cancel anytime'],
+  },
+  {
+    id: 'monthly-2', title: 'Monthly · 2 bags', price: 150, interval: 'month',
+    description: 'Two 250g bags every month — usually two different origins to keep it interesting.',
+    details: ['Free shipping in Romania', 'Two origins', 'Pause or cancel anytime'],
+  },
+];
+
 // Event booking packages (coffee cart hire)
 export const PACKAGES = [
   {
