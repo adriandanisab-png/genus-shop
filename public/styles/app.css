@@ -413,7 +413,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; }
 .product-card { border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
 .product-card:hover { box-shadow: var(--shadow-md); transform: translate(-2px,-2px) rotate(-0.5deg); }
 .product-card__media { background: var(--c, var(--gold)); border-bottom: var(--border-w) solid var(--ink-950); aspect-ratio: 1/1; }
-.product-card__media img { mix-blend-mode: multiply; }
+.product-card__media img { mix-blend-mode: normal; }
 .product-card__origin { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; background: var(--c, var(--gold)); color: var(--ink-950) !important; border: 2px solid var(--ink-950); border-radius: var(--radius-full); padding: 3px 10px; align-self: flex-start; }
 .product-card__name { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; font-size: 22px; }
 .product-card__price { font-family: var(--font-display); font-weight: 700; }
