@@ -4,7 +4,7 @@
 import { getCart } from './cart.js';
 
 // After deploying the Worker, paste its URL here (…workers.dev or your domain).
-const CHECKOUT_ENDPOINT = 'REPLACE_WITH_WORKER_URL';
+const CHECKOUT_ENDPOINT = 'https://genus-checkout.shop-genus-coffee.workers.dev';
 
 export async function startCheckout(onError) {
   const items = getCart().map((i) => ({ id: i.id, qty: i.qty }));
