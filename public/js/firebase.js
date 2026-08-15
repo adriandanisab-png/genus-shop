@@ -26,7 +26,7 @@ export const FUNCTIONS_REGION = 'us-central1';
 
 // Emails allowed into /admin. Real enforcement lives in firestore.rules — keep
 // these two lists in sync.
-export const ADMIN_EMAILS = ['adrian.danisab@gmail.com'];
+export const ADMIN_EMAILS = ['adrian.danisab@gmail.com', 'orange10verde10@gmail.com'];
 
 export const IS_CONFIGURED = !String(firebaseConfig.apiKey).startsWith('REPLACE');
 
