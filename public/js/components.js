@@ -14,11 +14,20 @@ export function originClass(origin) {
   return VALID_ORIGINS.includes(origin) ? origin : 'colombia';
 }
 
+const ORIGIN_COLOR = { colombia: 'brown', costarica: 'red', ethiopia: 'gold', kenya: 'green', rwanda: 'pink' };
+
+function tickerHTML() {
+  const items = ['Small-batch', 'Roasted in Bucureşti', '<b>Free shipping over 200 lei</b>', 'Single origin', 'Roasted to order', 'Dangerously drinkable'];
+  const seq = items.map((t) => `<span>${t}</span>✺`).join('');
+  return `<div class="ticker"><div class="ticker__track">${seq}${seq}</div></div>`;
+}
+
 /* ---------------------------------------------------------------- chrome */
 export function renderChrome(active) {
   const nav = document.getElementById('site-nav');
   if (nav) {
     nav.innerHTML = `
+      ${tickerHTML()}
       <nav class="nav">
         <a class="nav__brand" href="index.html">Genus</a>
         <div class="nav__links">
@@ -88,18 +97,18 @@ export function toast(message) {
 
 /* ---------------------------------------------------------------- product card */
 export function productCardHTML(p) {
+  const color = ORIGIN_COLOR[originClass(p.origin)] || 'gold';
   return `
-  <div class="product-card">
+  <div class="product-card product-card--${color}">
     <a class="product-card__overlay" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="View ${escapeHtml(p.name)}"></a>
     <div class="product-card__media">${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy">` : ''}</div>
     <div class="product-card__body">
-      ${p.originLabel ? `<span class="product-card__origin" style="color:var(--origin-${originClass(p.origin)})">${escapeHtml(p.originLabel)}</span>` : ''}
+      ${p.originLabel ? `<span class="product-card__origin">${escapeHtml(p.originLabel)}</span>` : ''}
       <h3 class="product-card__name">${escapeHtml(p.name)}</h3>
-      ${p.region ? `<div class="product-card__region">${escapeHtml(p.region)}</div>` : ''}
       ${p.notes ? `<div class="product-card__notes">${escapeHtml(p.notes)}</div>` : ''}
       <div class="product-card__foot">
         <span class="product-card__price">${formatMoney(p.price)}</span>
-        <button class="product-card__add" data-add="${escapeHtml(p.id)}" type="button">Add</button>
+        <button class="product-card__add" data-add="${escapeHtml(p.id)}" type="button">Add +</button>
       </div>
     </div>
   </div>`;
