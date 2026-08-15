@@ -1,83 +1,79 @@
-# Setup & deploy — Genus Coffee
+# Setup & deploy — Genus Coffee (Spark + Cloudflare Worker, no card)
 
-The site is wired to your Firebase project **`shop-genus-coffee`** (config, admin
-allow-list, region `europe-west1`). Firestore is enabled. What's left is to turn
-on Cloud Functions (Blaze), give Stripe its keys, and deploy. ~15 minutes.
+The site is wired to Firebase project **`shop-genus-coffee`** (config, admin
+allow-list). Firestore is enabled. Whole-basket checkout runs on a **Cloudflare
+Worker** — free, no credit card, no Blaze. ~15 minutes.
 
-Checkout is **whole-basket**: the cart calls the `createCheckoutSession` Cloud
-Function, which builds one Stripe Checkout Session for every item at once.
+Flow: cart → the Worker creates ONE Stripe Checkout Session for the whole basket
+→ customer pays → back to the site.
 
 ## 0. Prerequisites
 
-- **Firebase CLI** (already logged in as `orange10verde10@gmail.com` on this machine)
-- Your **Stripe secret key** — the same `sk_test_…` you used to make the Payment Links (Dashboard → Developers → API keys). *(The old Payment Links are no longer used and can be archived in Stripe.)*
-- Node 20+ (for `functions/` install)
+- **Firebase CLI** (already logged in as `orange10verde10@gmail.com` here)
+- A free **Cloudflare account** (sign up at dash.cloudflare.com — no card)
+- Your **Stripe secret key** — the same `sk_test_…` you used for the links
+- Node 20+
 
-## 1. Two things in the console
+## 1. One console toggle (no Blaze!)
 
-1. **Upgrade the project to the [Blaze plan](https://console.firebase.google.com/project/shop-genus-coffee/usage/details)** — Cloud Functions require it. Realistically ~€0/mo at your volume; set a budget alert if you like.
-2. **Authentication → Sign-in method → Google → Enable** (only needed for `/admin`).
+- **Authentication → Sign-in method → Google → Enable** — only needed for `/admin`.
 
-*(Firestore is already enabled — ✓.)*
+*(Firestore is already enabled ✓. Nothing else in Firebase.)*
 
-## 2. Stripe key + deploy the functions
-
-```bash
-cd ~/genus-coffee/functions
-npm install
-
-# your Stripe secret key
-firebase functions:secrets:set STRIPE_SECRET_KEY        # paste sk_test_...
-
-# deploy so the webhook URL exists
-firebase deploy --only functions
-```
-
-The deploy prints the **stripeWebhook** URL, e.g.
-`https://europe-west1-shop-genus-coffee.cloudfunctions.net/stripeWebhook`
-
-## 3. Point Stripe's webhook at it
-
-In **Stripe Dashboard → Developers → Webhooks → Add endpoint**:
-- URL = that `stripeWebhook` URL
-- Event = **`checkout.session.completed`**
-- Save, **Reveal** the signing secret (`whsec_…`), then:
+## 2. Deploy the checkout Worker (Cloudflare)
 
 ```bash
-firebase functions:secrets:set STRIPE_WEBHOOK_SECRET    # paste whsec_...
-firebase deploy --only functions:stripeWebhook
+cd ~/genus-coffee/worker
+
+npx wrangler login                          # opens the browser, approve access
+npx wrangler secret put STRIPE_SECRET_KEY   # paste sk_test_...  (stays on Cloudflare)
+npx wrangler deploy
 ```
 
-## 4. Deploy rules + site
+`deploy` prints the Worker URL, e.g.
+`https://genus-checkout.<your-subdomain>.workers.dev`
+
+Paste that URL into **`public/js/checkout.js`** → `CHECKOUT_ENDPOINT`:
+
+```js
+const CHECKOUT_ENDPOINT = 'https://genus-checkout.<your-subdomain>.workers.dev';
+```
+
+*(If your shop domain later isn't one of the three in `worker/src/index.js`
+`ALLOWED_ORIGINS`, add it and `npx wrangler deploy` again.)*
+
+## 3. Deploy the site (Firebase)
 
 ```bash
 cd ~/genus-coffee
 firebase deploy --only firestore:rules,hosting
 ```
 
-Live at **https://shop-genus-coffee.web.app**. Test a basket checkout with card
-`4242 4242 4242 4242` (any future date / any CVC); the order should appear in
-`/admin` → Orders, and in your Stripe Dashboard.
+Live at **https://shop-genus-coffee.web.app**. Test a whole-basket checkout with
+card `4242 4242 4242 4242` (any future date / any CVC).
 
-## 5. (Optional) Seed the catalog into Firestore
+## Where things show up
 
-Not required — the shop reads `js/data.js` and checkout has a server-side price
-fallback. Do it only to manage the catalog from Firestore later:
-
-```bash
-cd ~/genus-coffee/scripts && npm install
-gcloud auth application-default login
-node seed-products.js shop-genus-coffee
-```
+- **Shop orders** → your **[Stripe Dashboard](https://dashboard.stripe.com/payments)** (the `/admin` "Shop orders" tab links there). No webhook, so orders aren't copied into Firestore.
+- **Event bookings** → `/admin` (live from Firestore).
 
 ## Going live (real payments)
 
-1. Set `STRIPE_SECRET_KEY` to your **live** `sk_live_…` and redeploy functions.
-2. Add a **live-mode** webhook endpoint (same URL + event), set `STRIPE_WEBHOOK_SECRET` to its `whsec_…`, redeploy `stripeWebhook`.
+```bash
+cd ~/genus-coffee/worker
+npx wrangler secret put STRIPE_SECRET_KEY   # paste your LIVE sk_live_...
+npx wrangler deploy
+```
+(No site redeploy needed unless the Worker URL changes.)
+
+## If you later want orders inside /admin
+
+That needs a webhook writing to Firestore — either a Firebase Function (Blaze) or
+adding a webhook route to the Worker with a Firebase service account. Ask and I'll
+wire it up.
 
 ## Common gotchas
 
-- **Functions won't deploy** → project isn't on Blaze yet (step 1).
-- **Checkout button errors** → `STRIPE_SECRET_KEY` not set, or functions not deployed.
-- **Webhook 400s in Stripe** → `STRIPE_WEBHOOK_SECRET` doesn't match the endpoint; reset and redeploy `stripeWebhook`.
+- **Checkout says "not connected yet"** → `CHECKOUT_ENDPOINT` in `checkout.js` is still the placeholder.
+- **Checkout error / CORS** → your site origin isn't in `ALLOWED_ORIGINS` in `worker/src/index.js`; add it and redeploy the Worker.
 - **`/admin` says "no access"** → your Google email isn't in *both* `ADMIN_EMAILS` (js/firebase.js) and `firestore.rules`.

@@ -23,12 +23,5 @@ service cloud.firestore {
         && request.resource.data.status == 'new';
       allow read, update, delete: if isAdmin();
     }
-
-    // Orders — written only by the Stripe webhook via the Admin SDK (which
-    // bypasses these rules). No client writes; admins may read.
-    match /orders/{id} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
   }
 }

@@ -1,0 +1,7 @@
+name = "genus-checkout"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+workers_dev = true
+
+# STRIPE_SECRET_KEY is set as a secret, not here:
+#   cd worker && npx wrangler secret put STRIPE_SECRET_KEY
