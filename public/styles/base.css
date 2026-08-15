@@ -23,7 +23,7 @@ ul { margin: 0; }
 :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 /* App chrome utilities */
-.container { max-width: var(--container-max); margin: 0 auto; padding-left: var(--space-6); padding-right: var(--space-6); width: 100%; }
+.container { max-width: var(--container-max); margin: 0 auto; padding-left: clamp(20px, 5vw, 72px); padding-right: clamp(20px, 5vw, 72px); width: 100%; }
 .eyebrow {
   font-size: var(--text-small);
   letter-spacing: var(--tracking-widest);
