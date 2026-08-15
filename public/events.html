@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book the coffee cart — Genus Coffee</title>
+  <meta name="description" content="Hire the Genus Coffee cart for weddings, corporate events and pop-ups in and around Bucureşti. Request a quote.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main>
+    <section class="hero-dark">
+      <div class="eyebrow">Coffee cart for private events</div>
+      <h1 style="font-size:clamp(2.2rem,5.5vw,3.25rem); max-width:700px">We bring the bar. You bring the guest list.</h1>
+    </section>
+
+    <section class="container section">
+      <div class="grid-3" id="packages" style="margin-bottom:60px"></div>
+
+      <div class="grid-2">
+        <div>
+          <h2 style="font-size:1.75rem; margin-bottom:20px">Check availability</h2>
+          <form class="form" id="booking-form" novalidate>
+            <label class="field">
+              <span class="field__label">Name *</span>
+              <input class="input" name="name" required placeholder="Jane Popescu">
+            </label>
+            <label class="field">
+              <span class="field__label">Email *</span>
+              <input class="input" type="email" name="email" required placeholder="you@example.com">
+            </label>
+            <label class="field">
+              <span class="field__label">Phone</span>
+              <input class="input" type="tel" name="phone" placeholder="+40 7xx xxx xxx">
+            </label>
+            <label class="field">
+              <span class="field__label">Event date *</span>
+              <input class="input" type="date" name="date" required>
+            </label>
+            <label class="field">
+              <span class="field__label">Package</span>
+              <div class="select-wrap"><select class="select" name="package" id="package-select"></select></div>
+            </label>
+            <label class="field">
+              <span class="field__label">Estimated guests</span>
+              <input class="input" type="number" name="guests" min="1" placeholder="80">
+            </label>
+            <label class="field">
+              <span class="field__label">Anything else?</span>
+              <textarea class="textarea" name="message" placeholder="Venue, timing, milk preferences…"></textarea>
+            </label>
+            <div id="booking-error" class="notice" hidden></div>
+            <button class="btn btn--primary btn--lg" type="submit" id="booking-submit" style="margin-top:8px">Request a quote</button>
+          </form>
+          <div id="booking-done" hidden></div>
+        </div>
+
+        <div id="faq">
+          <h2 style="font-size:1.75rem; margin-bottom:20px">Common questions</h2>
+          <div id="faq-acc"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script type="module" src="js/events.js"></script>
+</body>
+</html>

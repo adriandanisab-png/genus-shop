@@ -1,0 +1,9 @@
+{
+  "name": "genus-coffee-scripts",
+  "private": true,
+  "type": "commonjs",
+  "description": "One-off maintenance scripts (Firestore product seeding).",
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

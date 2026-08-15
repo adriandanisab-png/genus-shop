@@ -1,0 +1,75 @@
+/* Genus Coffee — design tokens (colors + typography + spacing)
+   Ported verbatim from the Genus Coffee Design System. */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,400..600&family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ---- Colour ---- */
+  --ink-950: #15130f; --ink-800: #2b2620; --ink-600: #5b5346; --ink-400: #8c8272;
+  --paper-50: #fcfaf4; --paper-100: #f6f0e3; --paper-200: #ece3d1;
+  --tan-300: #d9c3a0; --tan-500: #b3925f;
+  --rust-500: #c15a3a; --rust-600: #a8492f; --rust-700: #833721;
+  --gold-500: #c68a2e; --gold-700: #96681f;
+  --olive-600: #5c6b3f; --olive-700: #454f30;
+  --burgundy-600: #7a2230; --burgundy-700: #5e1a25;
+  --brown-600: #6b4a2e;
+
+  --surface-page: var(--paper-50);
+  --surface-card: var(--paper-100);
+  --surface-sunken: var(--paper-200);
+  --surface-inverse: var(--ink-950);
+  --surface-inverse-elevated: var(--ink-800);
+
+  --text-primary: var(--ink-950);
+  --text-secondary: var(--ink-600);
+  --text-tertiary: var(--ink-400);
+  --text-inverse: var(--paper-50);
+  --text-on-accent: var(--paper-50);
+
+  --accent: var(--rust-600);
+  --accent-hover: var(--rust-700);
+  --accent-soft: color-mix(in oklch, var(--rust-600) 14%, var(--paper-100));
+
+  --border-subtle: color-mix(in oklch, var(--ink-950) 12%, transparent);
+  --border-strong: var(--ink-950);
+  --focus-ring: var(--rust-600);
+
+  --origin-colombia: var(--brown-600);
+  --origin-costarica: var(--burgundy-600);
+  --origin-ethiopia: var(--gold-500);
+  --origin-kenya: var(--olive-600);
+  --origin-rwanda: var(--rust-600);
+
+  /* ---- Typography ---- */
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-body: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Menlo, monospace;
+
+  --text-display-xl: 4rem;
+  --text-display-l: 2.75rem;
+  --text-h1: 2.125rem;
+  --text-h2: 1.625rem;
+  --text-h3: 1.25rem;
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.75rem;
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-widest: 0.14em;
+
+  /* ---- Spacing / radius / elevation ---- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+  --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 128px;
+  --radius-xs: 2px; --radius-sm: 4px; --radius-md: 8px; --radius-lg: 14px; --radius-full: 999px;
+  --shadow-sm: 0 1px 2px color-mix(in oklch, var(--ink-950) 8%, transparent);
+  --shadow-md: 0 8px 24px color-mix(in oklch, var(--ink-950) 10%, transparent);
+  --border-w: 1px;
+  --container-max: 1200px;
+}
