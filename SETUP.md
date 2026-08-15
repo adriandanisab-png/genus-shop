@@ -77,3 +77,30 @@ wire it up.
 - **Checkout says "not connected yet"** → `CHECKOUT_ENDPOINT` in `checkout.js` is still the placeholder.
 - **Checkout error / CORS** → your site origin isn't in `ALLOWED_ORIGINS` in `worker/src/index.js`; add it and redeploy the Worker.
 - **`/admin` says "no access"** → your Google email isn't in *both* `ADMIN_EMAILS` (js/firebase.js) and `firestore.rules`.
+
+## Orders in /admin (Stripe webhook → Firestore)
+
+So paid orders land in **/admin → Orders** (not just Stripe), the Worker records
+them to Firestore on a webhook. One-time setup:
+
+1. **Service account key**: Firebase console → Project settings → *Service accounts*
+   → **Generate new private key**. From the JSON you need `client_email` and `private_key`.
+2. **Give the Worker the secrets** (paste the `private_key` value exactly as it is in
+   the JSON — one line with `\n` in it; the Worker converts it):
+   ```bash
+   cd ~/genus-coffee/worker
+   npx wrangler secret put FIREBASE_CLIENT_EMAIL   # paste client_email
+   npx wrangler secret put FIREBASE_PRIVATE_KEY    # paste the private_key value
+   ```
+3. **Stripe webhook**: Dashboard → Developers → Webhooks → **Add endpoint**:
+   - URL = `https://genus-checkout.shop-genus-coffee.workers.dev/webhook`
+   - Event = **`checkout.session.completed`**
+   - Reveal the signing secret (`whsec_…`), then:
+   ```bash
+   npx wrangler secret put STRIPE_WEBHOOK_SECRET   # paste whsec_...
+   npx wrangler deploy
+   ```
+4. **Deploy the rules**: `firebase deploy --only firestore:rules`
+
+Now every completed checkout (one-off or subscription) writes an `orders/<sessionId>`
+doc, and /admin → Orders reads it. (Idempotent — Stripe retries are de-duped by id.)

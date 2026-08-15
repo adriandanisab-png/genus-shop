@@ -52,6 +52,7 @@ export default {
     try {
       if (path === '/' && request.method === 'POST') return await createCheckout(request, env, cors);
       if (path === '/subscribe' && request.method === 'POST') return await createSubscription(request, env, cors);
+      if (path === '/webhook' && request.method === 'POST') return await handleWebhook(request, env);
 
       if (path === '/orders' && request.method === 'GET') return await guard(request, cors, () => listOrders(env, cors));
       if (path === '/coupons' && request.method === 'GET') return await guard(request, cors, () => listCoupons(env, cors));
@@ -304,4 +305,135 @@ function json(obj, status, cors) {
 }
 function safeUrl(u) {
   try { const url = new URL(u); return url.origin + url.pathname; } catch { return null; }
+}
+
+/* ------------------------------------------------ webhook → Firestore orders */
+// Stripe → on checkout.session.completed, record a paid order to Firestore so
+// /admin Orders reads from the database, not the live Stripe API.
+// Needs secrets: STRIPE_WEBHOOK_SECRET, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY.
+async function handleWebhook(request, env) {
+  const raw = await request.text();
+  const ok = await verifyStripeSig(raw, request.headers.get('Stripe-Signature') || '', env.STRIPE_WEBHOOK_SECRET);
+  if (!ok) return new Response('Invalid signature', { status: 400 });
+
+  let event;
+  try { event = JSON.parse(raw); } catch { return new Response('Bad payload', { status: 400 }); }
+
+  if (event.type === 'checkout.session.completed') {
+    const s = event.data.object;
+    let items = [];
+    try {
+      const li = await stripe(`/v1/checkout/sessions/${s.id}/line_items?limit=100`, env);
+      items = (li.data || []).map((x) => ({ description: x.description || '', quantity: x.quantity || 1, amount: x.amount_total || 0 }));
+    } catch (_) { /* items best-effort */ }
+
+    const order = {
+      sessionId: s.id,
+      email: s.customer_details?.email || null,
+      name: s.customer_details?.name || null,
+      phone: s.customer_details?.phone || null,
+      amount: s.amount_total,
+      currency: s.currency,
+      status: s.payment_status || 'paid',
+      mode: s.mode || 'payment',
+      items,
+    };
+    try {
+      await firestoreUpsert(env, `orders/${s.id}`, order, s.created);
+    } catch (e) {
+      return new Response('Record failed: ' + e.message, { status: 500 }); // Stripe will retry
+    }
+  }
+  return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+}
+
+async function verifyStripeSig(payload, header, secret) {
+  if (!secret || !header) return false;
+  const parts = header.split(',').map((kv) => kv.split('='));
+  const t = parts.find(([k]) => k === 't')?.[1];
+  const v1s = parts.filter(([k]) => k === 'v1').map(([, v]) => v);
+  if (!t || !v1s.length) return false;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${t}.${payload}`));
+  const hex = [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return v1s.some((v1) => v1.length === hex.length && timingSafeEq(hex, v1));
+}
+function timingSafeEq(a, b) {
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+// Convert a JS object to Firestore REST typed fields.
+function toFsValue(v) {
+  if (v === null || v === undefined) return { nullValue: null };
+  if (typeof v === 'string') return { stringValue: v };
+  if (typeof v === 'boolean') return { booleanValue: v };
+  if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+  if (Array.isArray(v)) return { arrayValue: { values: v.map(toFsValue) } };
+  if (typeof v === 'object') return { mapValue: { fields: toFsFields(v) } };
+  return { stringValue: String(v) };
+}
+function toFsFields(obj) {
+  const f = {};
+  for (const [k, val] of Object.entries(obj)) if (val !== undefined) f[k] = toFsValue(val);
+  return f;
+}
+
+async function firestoreUpsert(env, path, obj, createdUnix) {
+  const token = await getAccessToken(env);
+  const fields = toFsFields(obj);
+  fields.createdAt = { timestampValue: new Date((createdUnix || Math.floor(Date.now() / 1000)) * 1000).toISOString() };
+  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/${path}`;
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
+  });
+  if (!r.ok) throw new Error(`firestore ${r.status} ${(await r.text()).slice(0, 140)}`);
+}
+
+// Service-account OAuth token (scope: datastore) via a signed JWT.
+let _sa = null, _saAt = 0;
+async function getAccessToken(env) {
+  if (_sa && Date.now() - _saAt < 3000000) return _sa;
+  if (!env.FIREBASE_CLIENT_EMAIL || !env.FIREBASE_PRIVATE_KEY) throw new Error('Firebase service account not configured');
+  const now = Math.floor(Date.now() / 1000);
+  const jwt = await signJwtRS256({
+    iss: env.FIREBASE_CLIENT_EMAIL,
+    scope: 'https://www.googleapis.com/auth/datastore',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now, exp: now + 3600,
+  }, env.FIREBASE_PRIVATE_KEY);
+  const r = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+  });
+  const d = await r.json();
+  if (!d.access_token) throw new Error('token exchange failed: ' + (d.error_description || d.error || r.status));
+  _sa = d.access_token; _saAt = Date.now();
+  return _sa;
+}
+
+async function signJwtRS256(claims, pem) {
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const unsigned = `${b64urlStr(JSON.stringify(header))}.${b64urlStr(JSON.stringify(claims))}`;
+  const key = await importPkcs8(pem);
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
+  return `${unsigned}.${b64urlEncodeBytes(new Uint8Array(sig))}`;
+}
+function b64urlStr(s) { return b64urlEncodeBytes(new TextEncoder().encode(s)); }
+function b64urlEncodeBytes(bytes) {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+async function importPkcs8(pem) {
+  const clean = pem.replace(/\\n/g, '\n')
+    .replace(/-----BEGIN PRIVATE KEY-----/, '')
+    .replace(/-----END PRIVATE KEY-----/, '')
+    .replace(/\s+/g, '');
+  const der = Uint8Array.from(atob(clean), (c) => c.charCodeAt(0));
+  return crypto.subtle.importKey('pkcs8', der.buffer, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
 }

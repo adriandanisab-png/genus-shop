@@ -1,7 +1,6 @@
 // Admin › Discounts — create & list Stripe promotion codes, via the Worker.
 import { escapeHtml } from '../components.js';
-import { adminFetch } from './api.js';
-import { errBox } from './orders.js';
+import { adminFetch, errBox } from './api.js';
 
 let _panel = null;
 

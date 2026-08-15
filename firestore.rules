@@ -23,5 +23,12 @@ service cloud.firestore {
         && request.resource.data.status == 'new';
       allow read, update, delete: if isAdmin();
     }
+
+    // Orders — written only by the Worker's service account (bypasses rules via
+    // IAM). No client writes; admins read.
+    match /orders/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
   }
 }

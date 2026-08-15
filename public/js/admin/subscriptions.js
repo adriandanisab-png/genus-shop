@@ -1,7 +1,6 @@
 // Admin › Subscriptions — active/past subscriptions from Stripe via the Worker.
 import { escapeHtml } from '../components.js';
-import { adminFetch, fmtUnix, fmtMinor } from './api.js';
-import { errBox } from './orders.js';
+import { adminFetch, fmtUnix, fmtMinor, errBox } from './api.js';
 
 export async function render(panel) {
   panel.innerHTML = '<p class="empty-state">Loading subscriptions…</p>';
