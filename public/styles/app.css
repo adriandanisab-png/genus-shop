@@ -457,3 +457,14 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; }
 .pe-card__blurb { color: var(--text-secondary); font-size: 14px; line-height: 1.45; margin-top: 6px; }
 .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .admin-tab { white-space: nowrap; }
+
+/* Past events → horizontal scroller (swipe / scroll sideways) */
+.pe-scroll {
+  display: flex; gap: var(--space-5); overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  padding: 6px 6px 20px; scrollbar-width: thin; scrollbar-color: var(--ink-950) transparent;
+}
+.pe-scroll .pe-card { flex: 0 0 clamp(250px, 74vw, 320px); scroll-snap-align: start; margin: 0; }
+.pe-scroll::-webkit-scrollbar { height: 10px; }
+.pe-scroll::-webkit-scrollbar-thumb { background: var(--ink-950); border-radius: 999px; }
+.pe-scroll::-webkit-scrollbar-track { background: transparent; }
