@@ -17,7 +17,7 @@ export function originClass(origin) {
 const ORIGIN_COLOR = { colombia: 'brown', costarica: 'red', ethiopia: 'gold', kenya: 'green', rwanda: 'pink' };
 
 function tickerHTML() {
-  const items = ['Small-batch', 'Roasted in Bucureşti', '<b>Free shipping over 200 lei</b>', 'Single origin', 'Roasted to order', 'Dangerously drinkable'];
+  const items = ['Small-batch', 'Roasted in Oradea', '<b>Free shipping over 200 lei</b>', 'Single origin', 'Roasted to order', 'Dangerously drinkable'];
   const seq = items.map((t) => `<span>${t}</span>✺`).join('');
   return `<div class="ticker"><div class="ticker__track">${seq}${seq}</div></div>`;
 }
@@ -67,8 +67,9 @@ function footerHTML() {
           <a href="events.html#faq">FAQ</a>
         </div>
         <div class="footer__col">
-          <span class="footer__head">Visit</span>
-          <span>Str. Cetatea de Balta 123A, Bucureşti</span>
+          <span class="footer__head">Find us</span>
+          <span>Oradea, România</span>
+          <a href="https://instagram.com/genuscoffee" target="_blank" rel="noopener">@genuscoffee</a>
         </div>
       </div>
     </div>

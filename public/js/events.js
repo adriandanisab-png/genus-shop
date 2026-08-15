@@ -1,6 +1,6 @@
 import { renderChrome, eventCardHTML, accordionHTML, wireAccordion, escapeHtml } from './components.js';
-import { PACKAGES, FAQ } from './data.js';
-import { IS_CONFIGURED, db, collection, addDoc, serverTimestamp } from './firebase.js';
+import { PACKAGES, FAQ, PAST_EVENTS } from './data.js';
+import { IS_CONFIGURED, db, collection, addDoc, getDocs, serverTimestamp } from './firebase.js';
 
 renderChrome('events');
 
@@ -109,3 +109,30 @@ function showThankYou() {
   doneEl.hidden = false;
   doneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+
+/* ---- Past events gallery (Firestore `pastEvents`, fallback to seed) ---- */
+function peCardHTML(e) {
+  const meta = [e.date, e.location].filter(Boolean).map(escapeHtml).join(' · ');
+  return `<figure class="pe-card">
+    <div class="pe-card__media">${e.image ? `<img src="${escapeHtml(e.image)}" alt="${escapeHtml(e.title || '')}" loading="lazy">` : ''}</div>
+    <figcaption class="pe-card__body">
+      ${meta ? `<div class="pe-card__meta">${meta}</div>` : ''}
+      <h3 class="pe-card__title">${escapeHtml(e.title || '')}</h3>
+      ${e.blurb ? `<p class="pe-card__blurb">${escapeHtml(e.blurb)}</p>` : ''}
+    </figcaption>
+  </figure>`;
+}
+
+async function loadPastEvents() {
+  const el = document.getElementById('past-events');
+  if (!el) return;
+  let list = PAST_EVENTS;
+  if (db) {
+    try {
+      const snap = await getDocs(collection(db, 'pastEvents'));
+      if (!snap.empty) list = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    } catch (err) { /* keep seed */ }
+  }
+  el.innerHTML = list.map(peCardHTML).join('');
+}
+loadPastEvents();

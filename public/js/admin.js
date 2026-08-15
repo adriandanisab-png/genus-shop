@@ -10,8 +10,9 @@ import * as orders from './admin/orders.js';
 import * as bookings from './admin/bookings.js';
 import * as discounts from './admin/discounts.js';
 import * as subscriptions from './admin/subscriptions.js';
+import * as pastevents from './admin/past-events.js';
 
-const MODULES = { products, orders, bookings, discounts, subscriptions };
+const MODULES = { products, orders, bookings, discounts, subscriptions, pastevents };
 
 renderChrome();
 

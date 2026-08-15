@@ -1,7 +1,7 @@
 // Genus Coffee — catalog + copy defaults.
 // These 5 lots double as (a) the demo catalog when Firestore is empty/unconfigured,
 // and (b) the seed data pushed by scripts/seed-products.js.
-// Prices are whole RON (lei), the currency of the Bucureşti roaster.
+// Prices are whole RON (lei), the currency of the Oradea roaster.
 
 export const CURRENCY = 'ron';        // Stripe currency code
 export const CURRENCY_LABEL = 'lei';
@@ -77,7 +77,15 @@ export const PACKAGES = [
 ];
 
 export const FAQ = [
-  { q: 'How far do you travel?', a: 'Up to 40km from Bucureşti at no extra cost — further by arrangement.' },
+  { q: 'How far do you travel?', a: 'Up to 40km from Oradea at no extra cost — further by arrangement.' },
   { q: 'How many guests can the cart serve?', a: 'Comfortably up to 150 guests across a 3-hour service window.' },
   { q: 'Do you offer decaf or non-dairy milk?', a: 'Yes, on every package at no extra charge.' },
+];
+
+// Past events — placeholder seed shown until you add real ones in /admin →
+// Past events. Replace the copy + images with your own from Instagram.
+export const PAST_EVENTS = [
+  { id: 'demo-wedding', title: 'A summer wedding', date: 'June 2026', location: 'near Oradea', blurb: '150 guests, flat whites till midnight.', image: 'assets/reference/illustration-hostess-wreath.jpg', sortOrder: 1 },
+  { id: 'demo-corporate', title: 'Corporate offsite', date: 'May 2026', location: 'Oradea', blurb: 'Cold brew on tap for the whole team.', image: 'assets/reference/illustration-harvester-framed.jpg', sortOrder: 2 },
+  { id: 'demo-popup', title: 'Weekend pop-up', date: 'April 2026', location: 'Piața Unirii, Oradea', blurb: 'Two days, a whole lot of espresso.', image: 'assets/reference/illustration-harvester-tree.jpg', sortOrder: 3 },
 ];

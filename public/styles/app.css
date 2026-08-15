@@ -445,3 +445,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; }
 .footer__head { font-family: var(--font-display); font-weight: 700; }
 .admin-tab { font-family: var(--font-display); font-weight: 600; }
 .status-pill { font-family: var(--font-display); font-weight: 700; border: 2px solid var(--ink-950); }
+
+/* ============================================================= PAST EVENTS */
+.pe-card { border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); background: var(--surface-card); box-shadow: var(--shadow-sm); overflow: hidden; margin: 0; transition: transform 140ms ease, box-shadow 140ms ease; }
+.pe-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-md); }
+.pe-card__media { aspect-ratio: 4/3; background: var(--paper-200); border-bottom: var(--border-w) solid var(--ink-950); }
+.pe-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.pe-card__body { padding: 16px 18px 18px; }
+.pe-card__meta { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.pe-card__title { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; font-size: 20px; }
+.pe-card__blurb { color: var(--text-secondary); font-size: 14px; line-height: 1.45; margin-top: 6px; }
+.admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.admin-tab { white-space: nowrap; }

@@ -30,5 +30,11 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
+
+    // Past events gallery — public read, admin write.
+    match /pastEvents/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
