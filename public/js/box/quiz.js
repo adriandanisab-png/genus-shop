@@ -4,8 +4,8 @@ renderBoxChrome('quiz');
 
 const KEY = 'genusBoxQuiz';
 const Q = [
-  { k: 'Metodă', q: 'Cum îți prepari cafeaua de obicei?', o: [['V60 / filtru', 'Pour-over, Chemex'], ['Espresso', 'Mașină acasă'], ['AeroPress', 'Rapid, versatil'], ['Moka', 'Ibric italian']] },
-  { k: 'Prăjire', q: 'Ce gust îți place mai mult?', o: [['Fructat, luminos', 'Citrice, fructe roșii'], ['Echilibrat', 'Caramel, nuci'], ['Intens, ciocolatos', 'Corp plin'], ['Nu știu încă', 'Vrem să descoperim împreună']] },
+  { k: 'Metodă', multi: true, q: 'Cum îți prepari cafeaua de obicei?', o: [['V60 / filtru', 'Pour-over, Chemex'], ['Espresso', 'Mașină acasă'], ['AeroPress', 'Rapid, versatil'], ['Moka', 'Ibric italian']] },
+  { k: 'Prăjire', multi: true, only: 'Nu știu încă', q: 'Ce gust îți place?', o: [['Fructat, luminos', 'Citrice, fructe roșii'], ['Echilibrat', 'Caramel, nuci'], ['Intens, ciocolatos', 'Corp plin'], ['Nu știu încă', 'Vrem să descoperim împreună']] },
   { k: 'Lapte', q: 'O bei cu lapte?', o: [['Neagră', 'Fără nimic'], ['Cu lapte', 'Flat white, cappuccino'], ['Și, și', 'Depinde de zi']] },
   { k: 'Cantitate', q: 'Câtă cafea bei pe săptămână?', o: [['1–4 cești', 'Ocazional'], ['5–10 cești', 'Zilnic, o cană'], ['10+ cești', 'Doi oameni sau mai mult']] },
   { k: 'Stil', q: 'Cât de aventuros vrei să fie?', o: [['Surprinde-mă', 'Origini și procese noi'], ['Pe gustul meu', 'Aproape de ce îmi place'], ['Un pic din ambele', 'O cafea nouă pe lună']] },
@@ -22,11 +22,15 @@ try {
   }
 } catch { /* storage unavailable */ }
 
+// Multi-choice questions store an array; older saved answers were single strings.
+const picked = (x) => [].concat(state.answers[x.k] || []);
+const hasAnswer = (x) => picked(x).length > 0;
+
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ } }
 
 function renderProfile() {
   $('profile').innerHTML = Q.map((x) =>
-    `<div class="profile__row"><dt>${x.k}</dt><dd>${escapeHtml(state.answers[x.k] || '—')}</dd></div>`).join('');
+    `<div class="profile__row"><dt>${x.k}</dt><dd>${escapeHtml(picked(x).join(', ') || '—')}</dd></div>`).join('');
 }
 
 function renderProgress() {
@@ -45,7 +49,8 @@ function renderStep() {
   const el = $('step');
   if (state.step >= Q.length) {
     const r = recommendation();
-    const method = state.answers['Metodă'] || 'metoda ta';
+    const methods = picked(Q[0]);
+    const method = methods.length ? new Intl.ListFormat('ro', { type: 'conjunction' }).format(methods) : 'metoda ta';
     el.innerHTML = `
       <h1 id="q-title" tabindex="-1">Recomandarea ta: ${r.name}, ${r.freqText}</h1>
       <p class="quiz__lead">Alegem cafele pentru ${escapeHtml(method)}. Poți schimba oricând cutia, frecvența sau orice cafea cu 5 zile înainte de livrare.</p>
@@ -57,29 +62,40 @@ function renderStep() {
     return;
   }
   const cur = Q[state.step];
-  const chosen = state.answers[cur.k];
+  const chosen = picked(cur);
   el.innerHTML = `
     <h1 id="q-title" tabindex="-1">${cur.q}</h1>
-    <div class="quiz__opts" role="group" aria-labelledby="q-title">
+    ${cur.multi ? '<p class="quiz__hint" id="q-hint">Poți alege mai multe variante.</p>' : ''}
+    <div class="quiz__opts" role="group" aria-labelledby="q-title"${cur.multi ? ' aria-describedby="q-hint"' : ''}>
       ${cur.o.map(([label, hint]) => `
-        <button type="button" class="opt-card" aria-pressed="${chosen === label}" data-v="${escapeHtml(label)}">
+        <button type="button" class="opt-card" aria-pressed="${chosen.includes(label)}" data-v="${escapeHtml(label)}">
           <span class="opt-card__title">${escapeHtml(label)}</span>
           <span class="opt-card__hint">${escapeHtml(hint)}</span>
         </button>`).join('')}
     </div>
     <div class="quiz__nav">
       <button type="button" class="btn btn--secondary" id="back"${state.step === 0 ? ' disabled' : ''}>Înapoi</button>
-      <button type="button" class="btn btn--primary" id="next"${chosen ? '' : ' disabled'}>Înainte</button>
+      <button type="button" class="btn btn--primary" id="next"${chosen.length ? '' : ' disabled'}>Înainte</button>
     </div>`;
   el.querySelectorAll('.opt-card').forEach((b) => b.addEventListener('click', () => {
-    state.answers[cur.k] = b.dataset.v;
+    const v = b.dataset.v;
+    if (!cur.multi) {
+      state.answers[cur.k] = v;
+    } else {
+      let list = picked(cur);
+      list = list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
+      // "Nu știu încă" excludes the specific tastes, and the other way round.
+      if (cur.only) list = v === cur.only ? list.filter((x) => x === cur.only) : list.filter((x) => x !== cur.only);
+      state.answers[cur.k] = list;
+    }
     save();
-    el.querySelectorAll('.opt-card').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    $('next').disabled = false;
+    const now = picked(cur);
+    el.querySelectorAll('.opt-card').forEach((x) => x.setAttribute('aria-pressed', String(now.includes(x.dataset.v))));
+    $('next').disabled = !now.length;
     renderProfile();
   }));
   $('back').addEventListener('click', () => { state.step = Math.max(0, state.step - 1); save(); go(); });
-  $('next').addEventListener('click', () => { if (!state.answers[cur.k]) return; state.step += 1; save(); go(); });
+  $('next').addEventListener('click', () => { if (!hasAnswer(cur)) return; state.step += 1; save(); go(); });
 }
 
 function draw(focus) {
