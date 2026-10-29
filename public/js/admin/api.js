@@ -3,7 +3,7 @@
 import { auth } from '../firebase.js';
 import { escapeHtml } from '../components.js';
 
-export const WORKER_BASE = 'https://genus-checkout.shop-genus-coffee.workers.dev';
+export const WORKER_BASE = 'https://genus-checkout.genus-coffee-oradea.workers.dev';
 
 export async function adminFetch(path, { method = 'GET', body } = {}) {
   const u = auth.currentUser;

@@ -93,7 +93,7 @@ them to Firestore on a webhook. One-time setup:
    npx wrangler secret put FIREBASE_PRIVATE_KEY    # paste the private_key value
    ```
 3. **Stripe webhook**: Dashboard → Developers → Webhooks → **Add endpoint**:
-   - URL = `https://genus-checkout.shop-genus-coffee.workers.dev/webhook`
+   - URL = `https://genus-checkout.genus-coffee-oradea.workers.dev/webhook`
    - Event = **`checkout.session.completed`**
    - Reveal the signing secret (`whsec_…`), then:
    ```bash

@@ -3,7 +3,7 @@ import { icon } from './icons.js';
 import { SUBSCRIPTION_PLANS, formatMoney } from './data.js';
 
 // Same Worker as checkout; /subscribe route (public).
-const SUBSCRIBE_ENDPOINT = 'https://genus-checkout.shop-genus-coffee.workers.dev/subscribe';
+const SUBSCRIBE_ENDPOINT = 'https://genus-checkout.genus-coffee-oradea.workers.dev/subscribe';
 
 renderChrome('subscribe');
 

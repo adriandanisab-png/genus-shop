@@ -6,7 +6,7 @@ import { formatMoney } from '../data.js';
 
 export { escapeHtml, formatMoney };
 
-export const WORKER = 'https://genus-checkout.shop-genus-coffee.workers.dev';
+export const WORKER = 'https://genus-checkout.genus-coffee-oradea.workers.dev';
 
 // Dates drive copy, never hand edits (handoff README: founding offer, gift banner).
 export const BOX_CONFIG = {
