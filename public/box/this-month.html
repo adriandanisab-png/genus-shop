@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cutia lunii — Genus Coffee Box</title>
+  <meta name="description" content="Cele trei cafele din cutia Genus a lunii: origine, procesare, note de gust și data prăjirii.">
+  <link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/styles/box.css">
+  <style>
+    .month-head { padding: 64px 0; }
+    .month-head h1 { margin: 12px 0 16px; }
+    .month-head p { margin: 0; max-width: 640px; }
+    .month-dates { display: flex; flex-wrap: wrap; gap: 32px; margin-top: 28px; }
+    .month-dates dt { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; color: var(--tan-300); }
+    .month-dates dd { margin: 4px 0 0; font-family: var(--font-mono); font-size: 18px; }
+    .coffee-grid, .cta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-5); }
+    .coffee-card { background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); overflow: hidden; display: flex; flex-direction: column; }
+    .coffee-card__media { background: var(--c, var(--tier-trio)); border-bottom: var(--border-w) solid var(--ink-950); height: 90px; }
+    .coffee-card--duo { --c: var(--tier-duo); } .coffee-card--trio { --c: var(--tier-trio); } .coffee-card--reserve { --c: var(--tier-reserve); }
+    .coffee-card__body { padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+    .coffee-card__tag { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+    .coffee-card h3 { margin: 0; font-size: 1.4rem; }
+    .coffee-card__roaster { margin: 0; color: var(--text-secondary); }
+    .spec { margin: 6px 0; padding: 12px; border: 2px solid var(--ink-950); border-radius: var(--radius-sm); background: var(--paper-50); display: grid; gap: 6px; }
+    .spec div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+    .spec dt { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .spec dd { margin: 0; font-family: var(--font-mono); text-align: right; }
+    .cta-card { background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .cta-card h2 { margin: 0; font-size: 1.5rem; }
+    .cta-card p { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main id="app">
+    <section class="hero-dark month-head"><div class="container" id="head"><p>Se încarcă…</p></div></section>
+    <section class="section"><div class="container" id="body"></div></section>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/box/this-month.js"></script>
+</body>
+</html>

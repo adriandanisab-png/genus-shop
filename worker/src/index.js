@@ -8,9 +8,14 @@
  *   GET  /coupons     → list promotion codes                   (admin)
  *   POST /coupons     → create coupon + promotion code         (admin)
  *   GET  /subscriptions → list subscriptions                   (admin)
+ *   GET  /plans       → Genus Coffee Box plan table            (public)
+ *   POST /review/credit → 25 lei credit for a 1–2★ box rating  (review token)
+ *   GET  /account/subscription, POST /account/{portal,skip,change,reactivate}
+ *                     → customer self-service                  (signed-in customer)
  *
- * Admin routes require a Firebase ID token: `Authorization: Bearer <token>`,
- * verified against Google's public keys with the email checked below.
+ * Admin and account routes require a Firebase ID token: `Authorization: Bearer <token>`,
+ * verified against Google's public keys (admin routes also check the email below).
+ * Box data contract: handoff/docs/box-data.md.
  *
  * Secret: `wrangler secret put STRIPE_SECRET_KEY`.
  */
@@ -32,7 +37,23 @@ const PRODUCTS = {
   'guji-uraga':   { name: 'Genus Coffee — Guji Uraga (Ethiopia Guji) 250g',        price: 89, description: 'Tropical fruit, citrus, intense sweetness' },
   'masai-aa-top': { name: 'Genus Coffee — Masai AA Top (Kenya Mount Kenya) 250g',  price: 95, description: 'Blackcurrant, tropical fruit, clementine' },
   'simbi-kinazi': { name: 'Genus Coffee — Simbi Kinazi (Rwanda Huye) 250g',        price: 85, description: 'Red fruit, cinnamon, white chocolate' },
+  // Genus Coffee Box one-off and gift boxes (handoff/docs/pricing.md). Gifts are prepaid, never subscriptions.
+  'box-duo':    { name: 'Genus Coffee Box — Duo, o singură dată (2 × 250g)',  price: 179, description: '1 prăjitorie invitată + Genus' },
+  'box-trio':   { name: 'Genus Coffee Box — Trio, o singură dată (3 × 250g)', price: 239, description: '2 prăjitorii invitate + Genus' },
+  'box-gift-1': { name: 'Genus Coffee Box — Gift Trio, 1 cutie',             price: 259, description: 'Cutie cadou cu bilet scris de mână' },
+  'box-gift-3': { name: 'Genus Coffee Box — Gift Trio, 3 luni (plătit integral)', price: 639, description: 'Trimisă lunar, 3 cutii' },
+  'box-gift-6': { name: 'Genus Coffee Box — Gift Trio, 6 luni (plătit integral)', price: 1249, description: 'Trimisă lunar, 6 cutii' },
 };
+
+// Genus Coffee Box subscriptions: monthly or every 2 months (interval_count 1 | 2).
+const BOX_PLANS = {
+  duo:     { name: 'Genus Coffee Box — Duo (2 × 250g)', price: 159, intervals: [1, 2] },
+  trio:    { name: 'Genus Coffee Box — Trio (3 × 250g)', price: 219, intervals: [1, 2] },
+  reserve: { name: 'Genus Coffee Box — Reserve (3 × 250g, micro-lot)', price: 259, intervals: [1, 2] },
+};
+// Founding offer: first Trio box at 199 lei for sign-ups until 31 Jan 2027 (a once-only coupon).
+const FOUNDING = { plan: 'trio', firstBoxPrice: 199, endsAt: '2027-01-31T23:59:59+02:00', couponId: 'box-founding-trio' };
+const REVIEW_CREDIT_LEI = 25;
 
 // Subscription plans. KEEP IN SYNC WITH SUBSCRIPTION_PLANS in public/js/data.js.
 const SUBSCRIPTION_PLANS = {
@@ -53,6 +74,9 @@ export default {
       if (path === '/' && request.method === 'POST') return await createCheckout(request, env, cors);
       if (path === '/subscribe' && request.method === 'POST') return await createSubscription(request, env, cors);
       if (path === '/webhook' && request.method === 'POST') return await handleWebhook(request, env);
+      if (path === '/plans' && request.method === 'GET') return plansResponse(cors);
+      if (path === '/review/credit' && request.method === 'POST') return await reviewCredit(request, env, cors);
+      if (path.startsWith('/account/')) return await userGuard(request, cors, (u) => account(path, request, u, env, cors));
 
       if (path === '/orders' && request.method === 'GET') return await guard(request, cors, () => listOrders(env, cors));
       if (path === '/coupons' && request.method === 'GET') return await guard(request, cors, () => listCoupons(env, cors));
@@ -81,7 +105,8 @@ async function createCheckout(request, env, cors) {
   form.set('cancel_url', cancelUrl);
   form.set('phone_number_collection[enabled]', 'true');
   form.set('allow_promotion_codes', 'true');
-  form.append('shipping_address_collection[allowed_countries][0]', 'RO');
+  if (!body.box) form.append('shipping_address_collection[allowed_countries][0]', 'RO');
+  applyBoxFields(form, body, 'payment_intent_data[metadata]');
 
   let i = 0;
   for (const it of items) {
@@ -103,6 +128,7 @@ async function createCheckout(request, env, cors) {
 /* ----------------------------------------------------- public: subscription */
 async function createSubscription(request, env, cors) {
   const body = await request.json().catch(() => ({}));
+  if (body.box) return createBoxSubscription(body, env, cors);
   const plan = SUBSCRIPTION_PLANS[String(body.planId)];
   if (!plan) return json({ error: 'Unknown plan.' }, 400, cors);
 
@@ -122,6 +148,197 @@ async function createSubscription(request, env, cors) {
 
   const session = await stripe('/v1/checkout/sessions', env, 'POST', form);
   return json({ id: session.id, url: session.url }, 200, cors);
+}
+
+
+/* ---------------------------------------------------------- Genus Coffee Box */
+function foundingActive() { return Date.now() <= Date.parse(FOUNDING.endsAt); }
+
+function plansResponse(cors) {
+  const subscriptions = {};
+  for (const [k, p] of Object.entries(BOX_PLANS)) subscriptions[k] = { name: p.name, price: p.price, intervals: p.intervals };
+  const pick = (id) => ({ id, price: PRODUCTS[id].price });
+  return json({
+    subscriptions,
+    oneOff: { duo: pick('box-duo'), trio: pick('box-trio') },
+    gift: { 1: pick('box-gift-1'), 3: pick('box-gift-3'), 6: pick('box-gift-6') },
+    founding: { active: foundingActive(), plan: FOUNDING.plan, firstBoxPrice: FOUNDING.firstBoxPrice, endsAt: FOUNDING.endsAt },
+  }, 200, { ...cors, 'Cache-Control': 'public, max-age=300' });
+}
+
+// Customer + gift details travel as Stripe metadata (max 500 chars per value).
+const clip = (v, n = 490) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, n);
+function applyBoxFields(form, body, metaPrefix) {
+  if (!body.box) return;
+  const c = body.customer || {};
+  const meta = { box: 'true', locker: clip(c.locker), name: clip(c.name, 120), phone: clip(c.phone, 40) };
+  if (body.gift) {
+    meta.gift = 'true';
+    meta.giftRecipient = clip(body.gift.recipient, 120);
+    meta.giftAddress = clip(body.gift.address);
+    meta.giftNote = clip(body.gift.note, 200);
+    meta.giftMonths = clip(body.gift.months, 2);
+  }
+  if (body.tasteProfile) meta.tasteProfile = clip(JSON.stringify(body.tasteProfile));
+  if (body.plan) { meta.plan = clip(body.plan, 20); meta.intervalCount = String(body.interval_count); }
+  for (const [k, v] of Object.entries(meta)) {
+    if (!v) continue;
+    form.set(`metadata[${k}]`, v);
+    if (metaPrefix) form.set(`${metaPrefix}[${k}]`, v);
+  }
+  if (c.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) form.set('customer_email', clip(c.email, 200));
+}
+
+async function createBoxSubscription(body, env, cors) {
+  const plan = BOX_PLANS[String(body.plan)];
+  const ic = parseInt(body.interval_count, 10);
+  if (!plan || !plan.intervals.includes(ic)) return json({ error: 'Plan necunoscut.' }, 400, cors);
+  if (!body.customer?.locker) return json({ error: 'Alege un easybox sau FANbox.' }, 400, cors);
+
+  const successUrl = safeUrl(body.successUrl) || `https://${PROJECT}.web.app/success.html`;
+  const cancelUrl = safeUrl(body.cancelUrl) || `https://${PROJECT}.web.app/box/plan.html`;
+  const form = new URLSearchParams();
+  form.set('mode', 'subscription');
+  form.set('success_url', `${successUrl}?session_id={CHECKOUT_SESSION_ID}`);
+  form.set('cancel_url', cancelUrl);
+  form.set('phone_number_collection[enabled]', 'true');
+  form.set('line_items[0][quantity]', '1');
+  form.set('line_items[0][price_data][currency]', CURRENCY);
+  form.set('line_items[0][price_data][unit_amount]', String(plan.price * 100));
+  form.set('line_items[0][price_data][recurring][interval]', 'month');
+  form.set('line_items[0][price_data][recurring][interval_count]', String(ic));
+  form.set('line_items[0][price_data][product_data][name]', plan.name);
+  applyBoxFields(form, { ...body, interval_count: ic }, 'subscription_data[metadata]');
+
+  // The server decides the founding discount; the client's `coupon` is only a hint.
+  if (body.plan === FOUNDING.plan && foundingActive()) {
+    await ensureFoundingCoupon(env, plan.price - FOUNDING.firstBoxPrice);
+    form.set('discounts[0][coupon]', FOUNDING.couponId);
+  } else {
+    form.set('allow_promotion_codes', 'true');
+  }
+  const session = await stripe('/v1/checkout/sessions', env, 'POST', form);
+  return json({ id: session.id, url: session.url }, 200, cors);
+}
+
+async function ensureFoundingCoupon(env, offLei) {
+  try { await stripe(`/v1/coupons/${FOUNDING.couponId}`, env); return; } catch (_) { /* create below */ }
+  const f = new URLSearchParams();
+  f.set('id', FOUNDING.couponId);
+  f.set('name', `Prima cutie Trio ${FOUNDING.firstBoxPrice} lei`);
+  f.set('amount_off', String(offLei * 100));
+  f.set('currency', CURRENCY);
+  f.set('duration', 'once');
+  f.set('redeem_by', String(Math.floor(Date.parse(FOUNDING.endsAt) / 1000)));
+  await stripe('/v1/coupons', env, 'POST', f);
+}
+
+// A 1–2★ rating earns 25 lei off the next invoice, once per subscriber per box.
+async function reviewCredit(request, env, cors) {
+  const body = await request.json().catch(() => ({}));
+  const token = String(body.token || ''), boxId = String(body.boxId || ''), coffeeId = String(body.coffeeId || '');
+  if (!/^[\w-]{16,}$/.test(token) || !/^\d{4}-\d{2}$/.test(boxId) || !/^[\w-]+$/.test(coffeeId)) return json({ error: 'Bad request' }, 400, cors);
+  const rt = await firestoreGet(env, `reviewTokens/${token}`);
+  if (!rt) return json({ error: 'Linkul a expirat' }, 404, cors);
+  const rating = await firestoreGet(env, `ratings/${boxId}_${token}_${coffeeId}`);
+  if (!rating || !(rating.stars >= 1 && rating.stars <= 2)) return json({ credited: false }, 200, cors);
+  const creditPath = `credits/${rt.subscriberId}_${boxId}`;
+  if (await firestoreGet(env, creditPath)) return json({ credited: true, already: true }, 200, cors);
+
+  const f = new URLSearchParams();
+  f.set('amount', String(-REVIEW_CREDIT_LEI * 100));
+  f.set('currency', CURRENCY);
+  f.set('description', `Garanția Genus Box ${boxId}: ${coffeeId}`);
+  await stripe(`/v1/customers/${rt.subscriberId}/balance_transactions`, env, 'POST', f);
+  await firestoreUpsert(env, creditPath, { amount: REVIEW_CREDIT_LEI, coffeeId, boxId, subscriberId: rt.subscriberId });
+  return json({ credited: true }, 200, cors);
+}
+
+/* ------------------------------------------------- customer self-service */
+async function userGuard(request, cors, fn) {
+  const u = await verifyIdToken(request);
+  if (!u || !u.email) return json({ error: 'Intră din nou în cont.' }, 401, cors);
+  return fn(u);
+}
+
+async function findBoxSubscription(env, email) {
+  const cs = await stripe(`/v1/customers?limit=10&email=${encodeURIComponent(email)}`, env);
+  let best = null;
+  for (const c of cs.data || []) {
+    const subs = await stripe(`/v1/subscriptions?limit=10&status=all&customer=${c.id}`, env);
+    for (const s of subs.data || []) {
+      if (s.metadata?.box !== 'true') continue;
+      if (!best || (best.status === 'canceled' && s.status !== 'canceled') || (s.status === best.status && s.created > best.created)) best = s;
+    }
+  }
+  return best;
+}
+
+async function account(path, request, u, env, cors) {
+  const sub = await findBoxSubscription(env, u.email.toLowerCase());
+  if (!sub) return json({ error: 'Nu am găsit niciun abonament.' }, 404, cors);
+  const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {};
+
+  if (path === '/account/subscription' && request.method === 'GET') {
+    return json({ subscription: subSummary(sub) }, 200, cors);
+  }
+  if (path === '/account/portal' && request.method === 'POST') {
+    const f = new URLSearchParams();
+    f.set('customer', sub.customer);
+    f.set('return_url', `https://${PROJECT}.web.app/account.html`);
+    const s = await stripe('/v1/billing_portal/sessions', env, 'POST', f);
+    return json({ url: s.url }, 200, cors);
+  }
+  if (path === '/account/skip' && request.method === 'POST') {
+    // Void the next invoice: resume collection just after the coming renewal.
+    const f = new URLSearchParams();
+    f.set('pause_collection[behavior]', 'void');
+    f.set('pause_collection[resumes_at]', String(periodEnd(sub) + 86400));
+    await stripe(`/v1/subscriptions/${sub.id}`, env, 'POST', f);
+    return json({ ok: true }, 200, cors);
+  }
+  if (path === '/account/change' && request.method === 'POST') {
+    const plan = BOX_PLANS[String(body.plan)];
+    const ic = parseInt(body.interval_count, 10);
+    if (!plan || !plan.intervals.includes(ic)) return json({ error: 'Plan necunoscut.' }, 400, cors);
+    const pf = new URLSearchParams();
+    pf.set('currency', CURRENCY);
+    pf.set('unit_amount', String(plan.price * 100));
+    pf.set('recurring[interval]', 'month');
+    pf.set('recurring[interval_count]', String(ic));
+    pf.set('product_data[name]', plan.name);
+    const price = await stripe('/v1/prices', env, 'POST', pf);
+    const f = new URLSearchParams();
+    f.set('items[0][id]', sub.items.data[0].id);
+    f.set('items[0][price]', price.id);
+    f.set('proration_behavior', 'none');
+    f.set('metadata[plan]', String(body.plan));
+    f.set('metadata[intervalCount]', String(ic));
+    await stripe(`/v1/subscriptions/${sub.id}`, env, 'POST', f);
+    return json({ ok: true }, 200, cors);
+  }
+  if (path === '/account/reactivate' && request.method === 'POST') {
+    if (sub.status === 'canceled') return json({ error: 'Abonamentul a fost anulat. Fă o comandă nouă din /box.' }, 409, cors);
+    const f = new URLSearchParams();
+    f.set('pause_collection', '');
+    f.set('cancel_at_period_end', 'false');
+    await stripe(`/v1/subscriptions/${sub.id}`, env, 'POST', f);
+    return json({ ok: true }, 200, cors);
+  }
+  return json({ error: 'Not found' }, 404, cors);
+}
+
+function periodEnd(s) { return s.current_period_end ?? s.items?.data?.[0]?.current_period_end ?? 0; }
+function subSummary(s) {
+  return {
+    id: s.id,
+    status: s.pause_collection ? 'paused' : s.status,
+    plan: s.metadata?.plan || null,
+    intervalCount: s.items?.data?.[0]?.price?.recurring?.interval_count ?? null,
+    currentPeriodEnd: periodEnd(s),
+    pauseResumesAt: s.pause_collection?.resumes_at ?? null,
+    cancelAtPeriodEnd: !!s.cancel_at_period_end,
+  };
 }
 
 /* --------------------------------------------------------------- admin: orders */
@@ -248,6 +465,11 @@ async function getJwks() {
 }
 
 async function verifyAdmin(request) {
+  const p = await verifyIdToken(request);
+  return p && ADMIN_EMAILS.includes(p.email) ? p : null;
+}
+
+async function verifyIdToken(request) {
   const m = (request.headers.get('Authorization') || '').match(/^Bearer (.+)$/);
   if (!m) return null;
   const parts = m[1].split('.');
@@ -263,7 +485,6 @@ async function verifyAdmin(request) {
   if (payload.iss !== `https://securetoken.google.com/${PROJECT}`) return null;
   if (!payload.exp || payload.exp < now) return null;
   if (payload.email_verified !== true) return null;
-  if (!ADMIN_EMAILS.includes(payload.email)) return null;
 
   try {
     const jwks = await getJwks();
@@ -292,7 +513,9 @@ function b64urlBytes(s) {
 }
 
 function corsHeaders(origin) {
-  const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  // Firebase Hosting preview channels: https://shop-genus-coffee--<channel>.web.app
+  const isPreview = new RegExp(`^https://${PROJECT}--[a-z0-9-]+\\.web\\.app$`).test(origin);
+  const allow = ALLOWED_ORIGINS.includes(origin) || isPreview ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -337,14 +560,61 @@ async function handleWebhook(request, env) {
       status: s.payment_status || 'paid',
       mode: s.mode || 'payment',
       items,
+      metadata: s.metadata || {},
     };
     try {
       await firestoreUpsert(env, `orders/${s.id}`, order, s.created);
+      if (s.mode === 'subscription' && s.metadata?.box === 'true') await recordSubscriber(env, s);
     } catch (e) {
       return new Response('Record failed: ' + e.message, { status: 500 }); // Stripe will retry
     }
+  } else if (['customer.subscription.updated', 'customer.subscription.deleted'].includes(event.type)) {
+    const sub = event.data.object;
+    if (sub.metadata?.box === 'true') {
+      const sum = subSummary(sub);
+      try {
+        await firestorePatch(env, `subscribers/${sub.customer}`, {
+          status: sum.status, intervalCount: sum.intervalCount, currentPeriodEnd: sum.currentPeriodEnd,
+          ...(sum.plan ? { plan: sum.plan } : {}), cancelAtPeriodEnd: sum.cancelAtPeriodEnd,
+        });
+      } catch (e) { return new Response('Record failed: ' + e.message, { status: 500 }); }
+    }
+  } else if (event.type === 'invoice.paid') {
+    const inv = event.data.object;
+    if (inv.subscription_details?.metadata?.box === 'true' || inv.parent?.subscription_details?.metadata?.box === 'true') {
+      try { await firestorePatch(env, `subscribers/${inv.customer}`, { lastPaidAt: inv.status_transitions?.paid_at || Math.floor(Date.now() / 1000) }); }
+      catch (e) { return new Response('Record failed: ' + e.message, { status: 500 }); }
+    }
   }
   return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+}
+
+// First paid box subscription → subscribers/{customerId} + a review token for the QR cards.
+async function recordSubscriber(env, s) {
+  const path = `subscribers/${s.customer}`;
+  const existing = await firestoreGet(env, path);
+  const email = (s.customer_details?.email || '').toLowerCase();
+  const token = existing?.reviewToken || randomToken();
+  let sub = null;
+  try { sub = await stripe(`/v1/subscriptions/${s.subscription}`, env); } catch (_) { /* best effort */ }
+  let tasteProfile = null;
+  try { tasteProfile = s.metadata.tasteProfile ? JSON.parse(s.metadata.tasteProfile) : null; } catch (_) { /* ignore */ }
+  await firestorePatch(env, path, {
+    email, customerId: s.customer, subscriptionId: s.subscription,
+    name: s.metadata.name || s.customer_details?.name || null,
+    phone: s.metadata.phone || s.customer_details?.phone || null,
+    plan: s.metadata.plan || null, intervalCount: Number(s.metadata.intervalCount) || 1,
+    status: sub ? subSummary(sub).status : 'active', currentPeriodEnd: sub ? periodEnd(sub) : null,
+    locker: s.metadata.locker || null, reviewToken: token,
+    ...(tasteProfile ? { tasteProfile } : {}),
+    ...(existing ? {} : { swaps: {}, skipMonths: [] }),
+  });
+  if (!existing?.reviewToken) await firestoreUpsert(env, `reviewTokens/${token}`, { subscriberId: s.customer, email });
+}
+
+function randomToken() {
+  const b = crypto.getRandomValues(new Uint8Array(18));
+  return b64urlEncodeBytes(b);
 }
 
 async function verifyStripeSig(payload, header, secret) {
@@ -391,6 +661,47 @@ async function firestoreUpsert(env, path, obj, createdUnix) {
     body: JSON.stringify({ fields }),
   });
   if (!r.ok) throw new Error(`firestore ${r.status} ${(await r.text()).slice(0, 140)}`);
+}
+
+// Merge-update only the given fields (Firestore updateMask); creates the doc if missing.
+async function firestorePatch(env, path, obj) {
+  const token = await getAccessToken(env);
+  const fields = toFsFields(obj);
+  fields.updatedAt = { timestampValue: new Date().toISOString() };
+  const mask = Object.keys(fields).map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+  const url = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/${path}?${mask}`;
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
+  });
+  if (!r.ok) throw new Error(`firestore ${r.status} ${(await r.text()).slice(0, 140)}`);
+}
+
+// Read one doc as a plain object (null if missing).
+async function firestoreGet(env, path) {
+  const token = await getAccessToken(env);
+  const r = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`firestore ${r.status}`);
+  return fromFsFields((await r.json()).fields || {});
+}
+function fromFsValue(v) {
+  if ('stringValue' in v) return v.stringValue;
+  if ('integerValue' in v) return Number(v.integerValue);
+  if ('doubleValue' in v) return v.doubleValue;
+  if ('booleanValue' in v) return v.booleanValue;
+  if ('timestampValue' in v) return v.timestampValue;
+  if ('arrayValue' in v) return (v.arrayValue.values || []).map(fromFsValue);
+  if ('mapValue' in v) return fromFsFields(v.mapValue.fields || {});
+  return null;
+}
+function fromFsFields(f) {
+  const o = {};
+  for (const [k, v] of Object.entries(f)) o[k] = fromFsValue(v);
+  return o;
 }
 
 // Service-account OAuth token (scope: datastore) via a signed JWT.

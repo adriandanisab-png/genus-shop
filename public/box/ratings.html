@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clasament — Genus Coffee Box</title>
+  <meta name="description" content="Clasamentul Genus: cele mai bine notate cafele și prăjitorii românești, doar cu note de la abonați care au primit cafeaua.">
+  <link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/styles/box.css">
+  <style>
+    .rank-head { padding: 64px 0; }
+    .rank-head h1 { margin: 12px 0 16px; }
+    .rank-head p { margin: 0 auto; }
+    .rank-table { width: 100%; border-collapse: collapse; background: var(--paper-100); border: var(--border-w) solid var(--ink-950); min-width: 640px; }
+    .rank-table th, .rank-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--ink-950); vertical-align: top; }
+    .rank-table th { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; background: var(--paper-50); }
+    .rank-table td.num, .rank-table th.num { text-align: right; font-family: var(--font-mono); white-space: nowrap; }
+    .rank-table .soon { color: var(--text-secondary); }
+    .table-scroll { border-radius: var(--radius-md); box-shadow: var(--shadow-card); margin-top: var(--space-5); }
+    .how-box { margin-top: var(--space-6); background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 22px; }
+    .how-box p { margin: 0; }
+    .rank-cta { margin-top: var(--space-6); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    .rank-cta p { margin: 4px 0 0; }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main>
+    <section class="hero-dark rank-head">
+      <div class="container">
+        <span class="eyebrow">Clasamentul Genus</span>
+        <h1>Cele mai bine notate cafele românești</h1>
+        <p id="intro"></p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="seg" id="filters" role="group" aria-label="Filtrează clasamentul"></div>
+        <div id="results" aria-live="polite"></div>
+        <div class="how-box"><p id="how"></p></div>
+        <div class="rank-cta">
+          <div><h2>Vrei să notezi și tu?</h2><p>Primești trei cafele pe lună și votul tău contează în clasament.</p></div>
+          <a class="btn btn--primary" href="/box/">ALEGE CUTIA →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/box/ratings.js"></script>
+</body>
+</html>

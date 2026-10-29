@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cafea bună, fără bătăi de cap — Genus Coffee Box</title>
+  <meta name="description" content="Cutia lunară Genus: trei prăjitorii românești, cafeaua aleasă după cum o prepari, livrată la easybox proaspăt prăjită.">
+  <link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/styles/box.css">
+  <style>
+    .hero-dark--box { padding: 72px 0 80px; text-align: center; }
+    .hero-dark--box .container { display: flex; flex-direction: column; align-items: center; gap: 24px; max-width: 1000px; }
+    .hero-dark--box h1, .hero-dark--box p { margin: 0; }
+    .hero-dark--box p { max-width: 560px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .hero-note { font-family: var(--font-mono); font-size: 14px; color: var(--tan-300); }
+    .box-grid, .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-5); }
+    .box-card__badge { align-self: flex-start; font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; background: var(--c); border: 2px solid var(--ink-950); border-radius: var(--radius-full); padding: 3px 10px; }
+    .box-card__desc { color: var(--text-secondary); font-size: 15px; flex: 1; }
+    .box-card .btn { align-self: flex-start; margin-top: 6px; }
+    .month-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-7); align-items: center; }
+    .month-grid img { width: 100%; height: auto; border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-hero); }
+    .month-grid .stack { align-items: flex-start; }
+    .waitlist { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; max-width: 560px; }
+    .waitlist .field { flex: 1 1 240px; }
+    .waitlist-msg { margin-top: 12px; min-height: 1.5em; }
+    .center-head { text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main>
+    <section class="hero-dark hero-dark--box">
+      <div class="container">
+        <span class="sticker">3 prăjitorii · o cutie · lunar</span>
+        <h1>Cafea bună, fără bătăi de cap.</h1>
+        <p>Alegem cafeaua după cum o prepari tu, o primești la easybox proaspăt prăjită, o notezi, și luna viitoare e și mai bună.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="/box/quiz.html">FĂ QUIZ-UL →</a>
+          <a class="btn btn--inverse" href="/box/gift.html">TRIMITE CADOU</a>
+        </div>
+        <p class="hero-note" id="founding-note" hidden>Prima cutie Trio 199 lei, pentru înscrieri până pe 31 ianuarie 2027.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="boxes-h">
+      <div class="container">
+        <div class="section-head"><h2 id="boxes-h">Alege-ți cutia</h2></div>
+        <div class="box-grid" id="box-grid"></div>
+        <div id="plans-notice" class="notice" role="status" hidden></div>
+      </div>
+    </section>
+
+    <section class="band--pink section" aria-labelledby="how-h">
+      <div class="container">
+        <div class="section-head"><h2 id="how-h">Cum merge</h2></div>
+        <div class="steps-grid">
+          <div class="step"><span class="step__num">01</span><h3>Spune-ne cum bei cafeaua</h3><p>V60, espresso sau AeroPress, cât bei pe săptămână. Un minut.</p></div>
+          <div class="step"><span class="step__num">02</span><h3>Primești cutia la easybox</h3><p>Data prăjirii pe fiecare pungă. Cu 5 zile înainte vezi cafelele și poți schimba sau sări luna.</p></div>
+          <div class="step"><span class="step__num">03</span><h3>Notezi, noi învățăm</h3><p>Scanezi QR-ul și dai note. Nu ți-a plăcut o cafea? 25 lei reducere data viitoare.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="month-section" aria-labelledby="month-h" hidden>
+      <div class="container" id="month-body"></div>
+    </section>
+
+    <section class="section" aria-labelledby="wait-h">
+      <div class="container">
+        <div class="section-head"><h2 id="wait-h">Vrei să afli primul?</h2></div>
+        <p>Lasă-ne emailul și îți scriem când se deschide următoarea cutie. Fără spam.</p>
+        <form class="waitlist" id="waitlist-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="wl-email">Email</label>
+            <input class="input" id="wl-email" type="email" autocomplete="email" required placeholder="nume@exemplu.ro">
+          </div>
+          <button class="btn btn--primary" type="submit">Anunță-mă</button>
+        </form>
+        <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="faq-h">
+      <div class="container">
+        <div class="section-head"><h2 id="faq-h">Întrebări</h2></div>
+        <div id="faq"></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/box/home.js"></script>
+</body>
+</html>

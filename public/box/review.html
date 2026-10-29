@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Părerea ta despre cutie — Genus Coffee Box</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/app.css">
+<link rel="stylesheet" href="/styles/box.css">
+<style>
+  .rv { max-width: 560px; margin: 0 auto; padding: 24px 16px 56px; display: flex; flex-direction: column; gap: 16px; }
+  .rv__head h1 { margin: 0 0 6px; }
+  .rv__head p { margin: 0; color: var(--text-secondary); }
+  .rv-card { background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; margin: 0; }
+  .rv-card legend { padding: 0; float: left; width: 100%; }
+  .rv-card legend + * { clear: both; }
+  .rv-slot { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); }
+  .rv-name { display: block; font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+  .rv-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .rv-chips .chip { min-height: 44px; padding: 0 16px; font-size: 14px; }
+  .rv-stars { position: relative; }
+  .rv-stars legend, .rv-tags-label { font-size: 13px; color: var(--text-secondary); }
+  .rv .textarea, .rv .input { width: 100%; box-sizing: border-box; min-height: 44px; }
+  .rv .btn { min-height: 48px; }
+  .rv-credit { font-weight: 600; }
+  .rv-credit[hidden], .notice[hidden] { display: none; }
+  .rv-done { text-align: center; padding: 32px 0; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+</style>
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+  <div class="rv" id="rv"><p role="status">Se încarcă…</p></div>
+</main>
+<div id="site-footer"></div>
+<script type="module" src="/js/box/review.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alege cutia — Genus Coffee Box</title>
+<meta name="description" content="Alege cutia Duo, Trio sau Reserve, frecvența și locul de livrare. Plată sigură prin Stripe.">
+<link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/app.css">
+<link rel="stylesheet" href="/styles/box.css">
+<style>
+  .plan { display: flex; flex-wrap: wrap; gap: 40px; padding-top: 48px; padding-bottom: 56px; align-items: flex-start; }
+  .plan__form { flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 32px; }
+  .plan__aside { flex: 1 1 320px; min-width: 0; }
+  .plan h1 { margin: 0; font-size: 44px; }
+  .plan__group { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .plan__legend { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.2em; color: var(--text-secondary); padding: 0; margin-bottom: 12px; text-transform: none; font-weight: 400; }
+  .plan__boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .opt-card--box { min-height: 110px; position: relative; }
+  .opt-card--box input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .opt-card--box:has(input:focus-visible) { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .opt-card__bar { display: block; height: 8px; border-radius: 3px; margin-bottom: 6px; background: var(--c); }
+  .plan__note { font-size: 14px; color: var(--text-secondary); margin: 0; }
+  .field__error { color: var(--rust-700, #c22a1c); font-size: 13px; min-height: 0; }
+  .field__error:empty { display: none; }
+  .plan .form-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .summary__row { display: flex; justify-content: space-between; gap: 12px; font-size: 16px; margin: 0; }
+  .summary__label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; color: var(--text-secondary); margin: 0; }
+  .summary__small { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+  .summary__list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+  .pay-spinner { display: inline-block; width: 16px; height: 16px; border: 3px solid var(--ink-950); border-right-color: transparent; border-radius: 50%; animation: spin 700ms linear infinite; vertical-align: -3px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .pay-spinner { animation-duration: 2s; } }
+  @media (max-width: 767px) { .plan h1 { font-size: clamp(2rem, 9vw, 2.6rem); } }
+</style>
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+  <div class="container plan">
+    <form class="plan__form" id="plan-form" novalidate>
+      <h1>Alege cutia</h1>
+      <fieldset class="plan__group">
+        <legend class="plan__legend">1 · CUTIA</legend>
+        <div class="plan__boxes" id="boxes"></div>
+      </fieldset>
+      <div class="plan__group" role="group" aria-labelledby="freq-label">
+        <div class="plan__legend" id="freq-label" style="margin-bottom:0">2 · CÂT DE DES</div>
+        <div class="seg" id="freqs"></div>
+        <p class="plan__note" id="freq-note" aria-live="polite"></p>
+      </div>
+      <fieldset class="plan__group">
+        <legend class="plan__legend">3 · LIVRARE</legend>
+        <div class="form-grid">
+          <div class="field"><label class="field__label" for="f-name">Nume complet</label><input class="input" id="f-name" name="name" type="text" autocomplete="name" placeholder="Ana Popescu" aria-describedby="e-name"><div class="field__error" id="e-name" aria-live="polite"></div></div>
+          <div class="field"><label class="field__label" for="f-locker">Easybox / FAN Box</label><input class="input" id="f-locker" name="locker" type="text" autocomplete="street-address" placeholder="easybox sau FANbox — oraș, adresă" aria-describedby="e-locker" required><div class="field__error" id="e-locker" aria-live="polite"></div></div>
+          <div class="field"><label class="field__label" for="f-email">Email</label><input class="input" id="f-email" name="email" type="email" autocomplete="email" placeholder="ana@exemplu.ro" aria-describedby="e-email"><div class="field__error" id="e-email" aria-live="polite"></div></div>
+          <div class="field"><label class="field__label" for="f-phone">Telefon (pentru SMS de livrare)</label><input class="input" id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="07xx xxx xxx" aria-describedby="e-phone"><div class="field__error" id="e-phone" aria-live="polite"></div></div>
+        </div>
+      </fieldset>
+    </form>
+    <aside class="plan__aside" aria-label="Comanda ta">
+      <div class="summary" id="summary"></div>
+    </aside>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script type="module" src="/js/box/plan.js"></script>
+</body>
+</html>

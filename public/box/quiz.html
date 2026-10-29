@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz de gust — Genus Coffee Box</title>
+<meta name="description" content="Cinci întrebări despre cum bei cafeaua și îți recomandăm cutia potrivită.">
+<link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/app.css">
+<link rel="stylesheet" href="/styles/box.css">
+<style>
+  .quiz { display: flex; flex-wrap: wrap; gap: 40px; padding-top: 56px; padding-bottom: 56px; }
+  .quiz__main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+  .quiz__step { display: flex; flex-direction: column; gap: 24px; transition: opacity 160ms ease-out; }
+  .quiz__step.is-fading { opacity: 0; }
+  .quiz__eyebrow { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.2em; color: var(--text-secondary); }
+  .quiz h1 { margin: 0; font-size: 44px; line-height: 1.1; }
+  .quiz h1:focus { outline: none; }
+  .quiz__opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .quiz__nav { display: flex; gap: 12px; flex-wrap: wrap; }
+  .quiz__lead { margin: 0; font-size: 18px; line-height: 1.5; max-width: 560px; }
+  .profile { flex: 1 1 300px; min-width: 0; align-self: flex-start; background: var(--ink-950); color: var(--paper-50); border-radius: var(--radius-md); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .profile__title { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; color: var(--tan-300); margin: 0; font-weight: 400; text-transform: none; }
+  .profile__row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--ink-800, #2b2620); padding-bottom: 10px; font-size: 15px; margin: 0; }
+  .profile__row dt { color: var(--tan-300); }
+  .profile__row dd { margin: 0; font-weight: 600; text-align: right; }
+  .profile__note { font-size: 13px; color: var(--tan-300); line-height: 1.5; margin: 0; }
+  @media (max-width: 767px) { .quiz h1 { font-size: clamp(2rem, 9vw, 2.6rem); } }
+  @media (prefers-reduced-motion: reduce) { .quiz__step { transition: none; } }
+</style>
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+  <div class="container quiz">
+    <div class="quiz__main">
+      <div>
+        <div class="quiz__eyebrow" id="eyebrow"></div>
+        <div class="progress" id="progress" role="progressbar" aria-label="Progres quiz" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="margin-top:10px"><div class="progress__bar" id="progress-bar" style="width:0%"></div></div>
+      </div>
+      <div class="quiz__step" id="step"></div>
+    </div>
+    <aside class="profile" aria-label="Profilul tău">
+      <h2 class="profile__title">PROFILUL TĂU</h2>
+      <dl id="profile" style="margin:0;display:flex;flex-direction:column;gap:14px"></dl>
+      <p class="profile__note">Răspunsurile devin profilul de gust. Notele pe care le dai cafelelor îl ajustează în fiecare lună.</p>
+    </aside>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script type="module" src="/js/box/quiz.js"></script>
+</body>
+</html>

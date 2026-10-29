@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cutia cadou — Genus Coffee Box</title>
+<meta name="description" content="Trei prăjitorii românești într-un cadou. Plată unică, fără abonament, cu bilet scris de mână.">
+<link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/app.css">
+<link rel="stylesheet" href="/styles/box.css">
+<style>
+  .gift-banner { text-align: center; padding: 12px 24px; border-bottom: var(--border-w) solid var(--ink-950); font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; font-size: 15px; }
+  .gift-banner[hidden] { display: none; }
+  .gift { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; padding-top: 56px; padding-bottom: 56px; }
+  .gift__visual { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+  .gift__panel { position: relative; height: 420px; background: var(--pink); border: var(--border-w) solid var(--ink-950); box-shadow: var(--shadow-hero); border-radius: var(--radius-md); overflow: hidden; display: grid; place-items: center; }
+  .gift__panel img { width: 220px; height: 220px; }
+  .gift__tag { position: absolute; right: 28px; bottom: 28px; width: 160px; padding: 12px; background: var(--paper-50); border-radius: 3px; transform: rotate(-5deg); box-shadow: 4px 4px 0 rgba(23,19,13,.25); }
+  .gift__tag small { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text-secondary); display: block; }
+  .gift__tag strong { font-family: var(--font-display); font-size: 18px; display: block; overflow-wrap: anywhere; }
+  .gift__tag span { font-size: 12px; white-space: pre-line; display: block; overflow-wrap: anywhere; max-height: 5.5em; overflow: hidden; }
+  .gift__facts { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; font-size: 14px; text-align: center; }
+  .gift__facts li { background: var(--paper-100); border-radius: 14px; padding: 12px; }
+  .gift__form { flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+  .gift__eyebrow { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.2em; color: var(--text-secondary); }
+  .gift h1 { margin: 0; font-size: 48px; line-height: 1.05; }
+  .gift__lead { margin: 0; font-size: 17px; line-height: 1.5; color: var(--text-secondary); }
+  .gift__durations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .gift__durations .seg__item { min-height: 72px; padding: 12px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .gift__durations .seg__item span:first-child { font-size: 20px; }
+  .gift__group { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .gift__group legend { font-weight: 600; padding: 0; margin-bottom: 10px; text-transform: none; font-family: var(--font-body); }
+  .field__error { color: var(--rust-700, #c22a1c); font-size: 13px; }
+  .field__error:empty { display: none; }
+  .gift__counter { font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); text-align: right; }
+  .gift__total { display: flex; justify-content: space-between; align-items: baseline; border-top: var(--border-w) solid var(--ink-950); padding-top: 16px; }
+  .gift__total strong { font-family: var(--font-display); font-size: 36px; }
+  .gift__small { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .pay-spinner { display: inline-block; width: 16px; height: 16px; border: 3px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 700ms linear infinite; vertical-align: -3px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .pay-spinner { animation-duration: 2s; } }
+  @media (max-width: 767px) { .gift h1 { font-size: clamp(2rem, 9vw, 2.6rem); } .gift__facts { grid-template-columns: 1fr; } .gift__panel { height: 320px; } }
+</style>
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+  <div class="gift-banner band--gold" id="gift-banner" hidden></div>
+  <div class="container gift">
+    <div class="gift__visual">
+      <div class="gift__panel">
+        <img id="gift-seal" src="/assets/box/seals/seal-gift.svg" alt="" width="220" height="220">
+        <div class="gift__tag" aria-hidden="true"><small>PENTRU</small><strong id="tag-name">[Nume]</strong><span id="tag-note">Crăciun fericit!</span></div>
+      </div>
+      <ul class="gift__facts">
+        <li>3 cafele de la 3 prăjitorii</li>
+        <li>Bilet scris de mână</li>
+        <li>Fără preț în cutie</li>
+      </ul>
+    </div>
+    <form class="gift__form" id="gift-form" novalidate>
+      <div>
+        <div class="gift__eyebrow">CUTIA CADOU</div>
+        <h1>Trei prăjitorii românești, într-un cadou.</h1>
+        <p class="gift__lead">Fără abonament. Destinatarul nu este înscris în nimic și nu vede prețul.</p>
+      </div>
+      <div class="gift__group" role="group" aria-labelledby="dur-label">
+        <div id="dur-label" style="font-weight:600">Durată</div>
+        <div class="gift__durations" id="durations"></div>
+        <p class="gift__small" id="dur-note" aria-live="polite"></p>
+      </div>
+      <fieldset class="gift__group">
+        <legend>De la tine</legend>
+        <div class="field"><label class="field__label" for="g-bname">Numele tău</label><input class="input" id="g-bname" type="text" autocomplete="name" aria-describedby="e-bname"><div class="field__error" id="e-bname" aria-live="polite"></div></div>
+        <div class="field"><label class="field__label" for="g-bemail">Email</label><input class="input" id="g-bemail" type="email" autocomplete="email" aria-describedby="e-bemail"><div class="field__error" id="e-bemail" aria-live="polite"></div></div>
+        <div class="field"><label class="field__label" for="g-bphone">Telefon</label><input class="input" id="g-bphone" type="tel" autocomplete="tel" aria-describedby="e-bphone"><div class="field__error" id="e-bphone" aria-live="polite"></div></div>
+      </fieldset>
+      <fieldset class="gift__group">
+        <legend>Pentru cine</legend>
+        <div class="field"><label class="field__label" for="g-rname">Pentru cine</label><input class="input" id="g-rname" type="text" placeholder="Numele destinatarului" aria-describedby="e-rname"><div class="field__error" id="e-rname" aria-live="polite"></div></div>
+        <div class="field"><label class="field__label" for="g-raddr">Livrare (adresă sau easybox)</label><input class="input" id="g-raddr" type="text" placeholder="Oraș, stradă sau easybox" aria-describedby="e-raddr"><div class="field__error" id="e-raddr" aria-live="polite"></div></div>
+        <div class="field"><label class="field__label" for="g-note">Biletul (îl scriem de mână, max. 200 caractere)</label><textarea class="textarea" id="g-note" rows="3" maxlength="200" placeholder="Crăciun fericit! Să-ți fie dimineața mai bună." aria-describedby="note-count"></textarea><div class="gift__counter" id="note-count" aria-live="polite">0 / 200</div></div>
+      </fieldset>
+      <div class="gift__total"><span style="font-weight:600">Total, livrare inclusă</span><strong id="total">— lei</strong></div>
+      <div id="pay-error" aria-live="polite"></div>
+      <button type="submit" class="btn btn--inverse btn--lg btn--block" id="pay" style="background:var(--ink-950);color:var(--paper-50);box-shadow:3px 3px 0 var(--red)" disabled>Trimite cadoul</button>
+      <p class="gift__small">Plată unică. Cutiile de 3 și 6 luni le trimitem lunar.</p>
+    </form>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script type="module" src="/js/box/gift.js"></script>
+</body>
+</html>

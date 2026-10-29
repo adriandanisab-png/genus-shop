@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prăjitorii partenere — Genus Coffee Box</title>
+  <meta name="description" content="Prăjitoriile românești care apar în cutia Genus, cu link direct către magazinul lor.">
+  <link rel="icon" href="/assets/box/seals/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/styles/box.css">
+  <style>
+    .rs-head { padding: 64px 0; }
+    .rs-head h1 { margin: 12px 0 16px; }
+    .rs-head p { margin: 0 auto; }
+    .rs-grid, .rs-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-5); }
+    .rs-card { background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .rs-top { display: flex; gap: 14px; align-items: center; }
+    .rs-avatar { width: 56px; height: 56px; flex: none; border: var(--border-w) solid var(--ink-950); border-radius: 50%; background: var(--gold); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 26px; overflow: hidden; }
+    .rs-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .rs-card h2 { margin: 0; font-size: 1.25rem; }
+    .rs-city { color: var(--text-secondary); font-size: 14px; }
+    .rs-story { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rs-months { font-family: var(--font-mono); font-size: 13px; }
+    .rs-panel { border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+    .rs-panel h2 { margin: 0; }
+    .rs-panel p { margin: 0; }
+    .rs-panel--gold { background: var(--gold); }
+    .rs-panel--cream { background: var(--paper-100); }
+    .rs-panel form { width: 100%; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .rs-panel .field { width: 100%; }
+    .rs-msg { min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main>
+    <section class="hero-dark rs-head">
+      <div class="container">
+        <span class="eyebrow">Prăjitoriile partenere</span>
+        <h1>Oamenii din spatele cutiei</h1>
+        <p>Fiecare lună aduce două prăjitorii românești invitate lângă Genus. Aici le găsești pe toate, cu link direct către magazinul lor.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div id="list" aria-live="polite"><p>Se încarcă…</p></div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container rs-forms">
+        <div class="rs-panel rs-panel--gold">
+          <span class="eyebrow">Pentru prăjitorii</span>
+          <h2>Vrei să fii în cutie?</h2>
+          <p>Comandă lunară fixă, plată în 15 zile, povestea și logo-ul tău pe card, și notele abonaților pentru cafeaua ta. Fără exclusivitate.</p>
+          <a class="btn btn--secondary" href="https://wa.me/40723910971" target="_blank" rel="noopener">APLICĂ CA PARTENER</a>
+        </div>
+        <div class="rs-panel rs-panel--cream">
+          <h2>Ai o prăjitorie preferată?</h2>
+          <p>Spune-ne pe cine vrei în cutie. Le scriem noi.</p>
+          <form id="nom-form" novalidate>
+            <div class="field"><label class="field__label" for="nom-roaster">Prăjitoria</label><input class="input" id="nom-roaster" required maxlength="120"></div>
+            <div class="field"><label class="field__label" for="nom-city">Orașul</label><input class="input" id="nom-city" maxlength="80"></div>
+            <div class="field"><label class="field__label" for="nom-note">De ce (opțional)</label><textarea class="textarea" id="nom-note" rows="3" maxlength="500"></textarea></div>
+            <button class="btn btn--primary" type="submit">NOMINALIZEAZĂ</button>
+          </form>
+          <p class="rs-msg" id="nom-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="/js/box/roasters.js"></script>
+</body>
+</html>

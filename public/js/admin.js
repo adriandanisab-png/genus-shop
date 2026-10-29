@@ -11,8 +11,9 @@ import * as bookings from './admin/bookings.js';
 import * as discounts from './admin/discounts.js';
 import * as subscriptions from './admin/subscriptions.js';
 import * as pastevents from './admin/past-events.js';
+import * as box from './admin/box.js';
 
-const MODULES = { products, orders, bookings, discounts, subscriptions, pastevents };
+const MODULES = { products, orders, bookings, discounts, subscriptions, box, pastevents };
 
 renderChrome();
 

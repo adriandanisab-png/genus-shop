@@ -104,3 +104,22 @@ them to Firestore on a webhook. One-time setup:
 
 Now every completed checkout (one-off or subscription) writes an `orders/<sessionId>`
 doc, and /admin → Orders reads it. (Idempotent — Stripe retries are de-duped by id.)
+
+## Genus Coffee Box (`/box`) — go-live checklist
+
+Spec: `handoff/README.md`, data contract: `handoff/docs/box-data.md`.
+
+1. **Worker** (plans, box checkout, account, review credit, subscriber webhook):
+   `cd worker && npx wrangler deploy` — existing routes are unchanged.
+2. **Firestore rules** (new box collections): `firebase deploy --only firestore:rules`
+3. **Stripe Dashboard**
+   - Webhook endpoint `…/webhook`: add events `customer.subscription.updated`,
+     `customer.subscription.deleted` and `invoice.paid` (keep `checkout.session.completed`).
+   - Settings → Billing → **Customer portal**: activate it (pause, cancel, payment method, invoices).
+   - The founding coupon `box-founding-trio` (−20 lei, once) is created automatically on the first Trio checkout.
+4. **Firebase console** → Authentication → Sign-in method → **Email/Password → Email link** on (for `/account`).
+5. **Preview first**: `firebase hosting:channel:deploy box --expires 14d`, test, then
+   `firebase deploy --only hosting` to go live.
+6. In `/admin → Box`: add coffees, roasters (tick "Signed & agreed" only after they agree), and publish the month's line-up.
+
+Open before launch (from the handoff): legal check of the terms and the 25 lei guarantee (ANPC), real box photos, locker picker (v1 is a manual field), min ratings for the ranking (set to 10 in `js/box/shared.js`).

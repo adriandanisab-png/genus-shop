@@ -36,5 +36,69 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    /* ------------------------------------------------ Genus Coffee Box
+       Contract: handoff/docs/box-data.md. The Worker's service account writes
+       subscribers / reviewTokens / credits (bypasses rules via IAM). */
+    function signedInEmail() {
+      return request.auth != null && request.auth.token.email_verified == true
+        ? request.auth.token.email.lower() : '';
+    }
+
+    match /boxes/{month} { allow read: if true; allow write: if isAdmin(); }
+    match /coffees/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /rankings/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // Only roasters who signed and agreed are public; queries must filter public == true.
+    match /roasters/{id} {
+      allow read: if resource.data.public == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /subscribers/{id} {
+      allow read: if isAdmin() || (signedInEmail() != '' && resource.data.email == signedInEmail());
+      allow update: if isAdmin() || (signedInEmail() != '' && resource.data.email == signedInEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['swaps', 'locker']));
+      allow create, delete: if isAdmin();
+    }
+
+    // The token is the secret: fetch by id only, never list.
+    match /reviewTokens/{token} {
+      allow get: if true;
+      allow list, write: if isAdmin();
+    }
+
+    // ratings/{boxId}_{token}_{coffeeId}, written from the review page with a valid token.
+    match /ratings/{id} {
+      function validRating() {
+        let d = request.resource.data;
+        let rt = get(/databases/$(database)/documents/reviewTokens/$(d.token)).data;
+        return id == d.boxId + '_' + d.token + '_' + d.coffeeId
+          && d.stars is int && d.stars >= 1 && d.stars <= 5
+          && d.tags is list && d.tags.size() <= 6
+          && (!('note' in d) || (d.note is string && d.note.size() <= 1000))
+          && d.subscriberId == rt.subscriberId && d.email == rt.email;
+      }
+      allow get: if true;
+      allow list: if isAdmin() || (signedInEmail() != '' && resource.data.email == signedInEmail());
+      allow create, update: if validRating();
+      allow delete: if isAdmin();
+    }
+
+    match /nominations/{id} {
+      allow create: if request.resource.data.roaster is string
+        && request.resource.data.roaster.size() > 0 && request.resource.data.roaster.size() <= 120;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /waitlist/{id} {
+      allow create: if request.resource.data.email is string
+        && request.resource.data.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$');
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /credits/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
   }
 }
