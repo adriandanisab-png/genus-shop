@@ -54,6 +54,7 @@ export function getPlans() {
 export async function startBoxCheckout(payload) {
   const isSub = !!payload.plan;
   const origin = location.origin;
+  const fail = 'Plata nu a pornit, încearcă din nou';
   const res = await fetch(isSub ? `${WORKER}/subscribe` : `${WORKER}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -63,9 +64,10 @@ export async function startBoxCheckout(payload) {
       successUrl: `${origin}/success.html`,
       cancelUrl: location.href.split('#')[0],
     }),
-  });
+  }).catch(() => null);
+  if (!res) throw new Error(fail);
   const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.url) throw new Error(data.error || 'Plata nu a pornit, încearcă din nou');
+  if (!res.ok || !data.url) throw new Error(data.error || fail);
   location.assign(data.url);
 }
 

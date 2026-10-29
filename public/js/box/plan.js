@@ -131,8 +131,8 @@ async function pay() {
         customer, tasteProfile: tasteProfile(),
       });
     }
-  } catch {
-    busy = false; error = 'Plata nu a pornit, încearcă din nou'; renderSummary();
+  } catch (e) {
+    busy = false; error = e.message || 'Plata nu a pornit, încearcă din nou'; renderSummary();
   }
 }
 

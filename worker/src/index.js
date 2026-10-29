@@ -68,13 +68,14 @@ export default {
     const cors = corsHeaders(request.headers.get('Origin') || '');
 
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
-    if (!env.STRIPE_SECRET_KEY) return json({ error: 'Server not configured' }, 500, cors);
+    // The plan table needs no Stripe key, so /box pages show prices before payments are connected.
+    if (path === '/plans' && request.method === 'GET') return plansResponse(cors);
+    if (!env.STRIPE_SECRET_KEY) return json({ error: 'Plățile nu sunt conectate încă. Revino în curând.' }, 503, cors);
 
     try {
       if (path === '/' && request.method === 'POST') return await createCheckout(request, env, cors);
       if (path === '/subscribe' && request.method === 'POST') return await createSubscription(request, env, cors);
       if (path === '/webhook' && request.method === 'POST') return await handleWebhook(request, env);
-      if (path === '/plans' && request.method === 'GET') return plansResponse(cors);
       if (path === '/review/credit' && request.method === 'POST') return await reviewCredit(request, env, cors);
       if (path.startsWith('/account/')) return await userGuard(request, cors, (u) => account(path, request, u, env, cors));
 

@@ -100,8 +100,8 @@ $('gift-form').addEventListener('submit', async (e) => {
       customer: { name: el('bname').value.trim(), email: el('bemail').value.trim(), phone: el('bphone').value.trim() },
       gift: { recipient: el('rname').value.trim(), address: el('raddr').value.trim(), note: clip(cleanNote(el('note').value).trim(), 200), months },
     });
-  } catch {
-    busy = false; error = 'Plata nu a pornit, încearcă din nou'; renderPay();
+  } catch (e) {
+    busy = false; error = e.message || 'Plata nu a pornit, încearcă din nou'; renderPay();
   }
 });
 
