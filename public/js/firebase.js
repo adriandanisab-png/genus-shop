@@ -32,10 +32,11 @@ export const auth = app ? getAuth(app) : null;
 // Re-export the SDK operations pages need, so the version lives in one place.
 export {
   collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
-  onSnapshot, query, where, orderBy, serverTimestamp,
+  onSnapshot, query, where, orderBy, limit, serverTimestamp, writeBatch,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 export {
   onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 // Google Analytics — loaded lazily, only in supported browsers. NOTE: this

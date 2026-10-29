@@ -1,0 +1,114 @@
+/* =============================================================== GENUS COFFEE BOX
+   Add-on for the /box section. Load AFTER tokens.css, base.css and app.css:
+   it reuses the PLAYFUL RESKIN tokens (--border-w, --shadow-sm/md, --radius-*)
+   and only adds what the box pages need. Designs: handoff/designs/*.dc.html. */
+
+:root {
+  /* box tiers: one colour per box, used for seal ring, card media, badge, belly band */
+  --tier-duo: var(--green);      /* #17a05b */
+  --tier-trio: var(--red);       /* #ff5140 */
+  --tier-reserve: var(--gold);   /* #f5a623 */
+  --tier-gift: var(--pink);      /* #ff7fb0 */
+
+  --shadow-card: 4px 4px 0 var(--ink-950);    /* resting card */
+  --shadow-hero: 6px 6px 0 var(--ink-950);    /* big images, box panels */
+  --sticker-tilt: -4deg;
+}
+
+/* Text on red / gold / pink / green is always ink (6:1+). White on --red is only 3.2:1. */
+.btn--primary, .btn--primary:hover { color: var(--ink-950); }
+
+/* ---- sticker: tilted pill label (hero eyebrow, "CEA MAI ALEASĂ", "FĂRĂ ABONAMENT") */
+.sticker {
+  display: inline-block; font-family: var(--font-display); font-weight: 700; font-size: 13px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-950);
+  background: var(--s, var(--pink)); border: var(--border-w) solid var(--ink-950);
+  border-radius: var(--radius-full); padding: 6px 14px; transform: rotate(var(--sticker-tilt));
+}
+.sticker--gold { --s: var(--gold); } .sticker--green { --s: var(--tier-duo); } .sticker--cream { --s: var(--paper-50); }
+.sticker--right { --sticker-tilt: 6deg; }
+
+/* ---- box card (homepage grid, /box/plan) */
+.box-card {
+  --c: var(--tier-trio);
+  background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card); overflow: hidden; display: flex; flex-direction: column;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.box-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-md); }
+.box-card__media { background: var(--c); border-bottom: var(--border-w) solid var(--ink-950); height: 150px; display: grid; place-items: center; }
+.box-card__media img { width: 110px; height: 110px; }
+.box-card__body { padding: 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.box-card__name { font-family: var(--font-display); font-weight: 700; font-size: 26px; text-transform: uppercase; letter-spacing: 0.04em; }
+.box-card__price { font-family: var(--font-mono); font-size: 17px; }
+.box-card--duo { --c: var(--tier-duo); } .box-card--trio { --c: var(--tier-trio); }
+.box-card--reserve { --c: var(--tier-reserve); } .box-card--gift { --c: var(--tier-gift); }
+
+/* ---- option card (quiz answers, plan box picker) — a real <button> or <label><input type=radio> */
+.opt-card {
+  text-align: left; min-height: 96px; padding: 18px; display: flex; flex-direction: column; gap: 6px; justify-content: center;
+  background: var(--paper-100); color: var(--ink-950); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md);
+  cursor: pointer; font-family: var(--font-body);
+}
+.opt-card:hover { background: var(--paper-200); }
+.opt-card[aria-pressed="true"], .opt-card:has(input:checked) { border-width: 3px; background: var(--paper-200); box-shadow: 4px 4px 0 var(--red); }
+.opt-card:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.opt-card__title { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.opt-card__hint { font-size: 14px; color: var(--text-secondary); }
+
+/* ---- segmented pills (frequency, gift duration, ranking filters) */
+.seg { display: flex; flex-wrap: wrap; gap: 10px; }
+.seg__item {
+  min-height: 48px; padding: 0 20px; border-radius: var(--radius-full); border: var(--border-w) solid var(--ink-950);
+  background: var(--paper-100); color: var(--ink-950); font-family: var(--font-display); font-weight: 700; font-size: 15px; cursor: pointer;
+}
+.seg__item[aria-pressed="true"] { background: var(--ink-950); color: var(--paper-50); }
+
+/* ---- quiz progress */
+.progress { height: 14px; background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-full); overflow: hidden; }
+.progress__bar { height: 100%; background: var(--red); transition: width 240ms ease; }
+
+/* ---- order summary (plan, gift) */
+.summary { background: var(--paper-100); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 26px; display: flex; flex-direction: column; gap: 14px; position: sticky; top: 24px; }
+.summary__total { display: flex; justify-content: space-between; align-items: baseline; border-top: var(--border-w) solid var(--ink-950); padding-top: 14px; }
+.summary__total strong { font-family: var(--font-display); font-size: 36px; font-weight: 700; }
+.summary__discount { color: var(--olive-700); }
+@media (max-width: 860px) { .summary { position: static; } }
+
+/* ---- star rating (review page) — radio group, 48px targets */
+.stars { display: flex; gap: 4px; border: 0; padding: 0; margin: 0; }
+.stars input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.stars label { width: 48px; height: 48px; display: grid; place-items: center; cursor: pointer; }
+.stars svg path { fill: var(--paper-100); stroke: var(--ink-950); stroke-width: 1.4; }
+.stars label.is-on svg path { fill: var(--red); }
+.stars input:focus-visible + label { outline: 3px solid var(--blue); border-radius: 8px; }
+
+/* ---- flavour tag chips (toggle buttons) */
+.chip { min-height: 36px; padding: 0 12px; border-radius: var(--radius-full); border: 2px solid var(--ink-950); background: var(--paper-100); color: var(--ink-950); font: 500 13px var(--font-body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink-950); color: var(--paper-50); }
+
+/* ---- coloured bands (pink "how it works", gold gift banner) */
+.band--pink { background: var(--pink); }
+.band--gold { background: var(--gold); }
+.band--pink, .band--gold { border-top: var(--border-w) solid var(--ink-950); border-bottom: var(--border-w) solid var(--ink-950); }
+
+/* ---- step card ("cum merge") */
+.step { background: var(--paper-50); border: var(--border-w) solid var(--ink-950); border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+.step:nth-child(2) { transform: rotate(-1deg); }
+.step__num { font-family: var(--font-display); font-weight: 700; font-size: 48px; color: var(--rust-700); }
+
+@media (prefers-reduced-motion: reduce) {
+  .box-card, .step, .progress__bar, .ticker__track { transition: none; animation: none; transform: none; }
+}
+
+/* ---- box nav: "BOX" sticker next to the wordmark; "Contul meu" stays visible on mobile */
+.box-nav__sticker { font-size: 11px; padding: 3px 10px; margin-left: 6px; vertical-align: middle; }
+.box-nav__account { white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.ticker:hover .ticker__track { animation-play-state: paused; }
+@media (max-width: 767px) { h1 { font-size: clamp(2rem, 9vw, 2.6rem); } }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+@media (max-width: 767px) {
+  .box-nav { flex-wrap: wrap; row-gap: 10px; }
+  .box-nav .nav__links { order: 3; width: 100%; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; }
+}
