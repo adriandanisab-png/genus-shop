@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box mock-ups for all four boxes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1600px; height: 960px; box-sizing: border-box; padding: 48px 56px; background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="align-self: flex-start; background: #ff7fb0; border: 2.5px solid #17130d; border-radius: 999px; padding: 5px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; transform: rotate(-3deg)">MOCK-UP · CONCEPT</span>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 56px; font-weight: 700; letter-spacing: 1.5px; line-height: 1">PATRU CUTII, O FAMILIE</div>
+    </div>
+    <div style="font-size: 16px; color: #5b5346; max-width: 520px; text-align: right">One matte black mailer for all four. The seal colour, the number and the bright belly band change, so one box print run covers everything.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; flex-grow: 1">
+    <sc-for list="{{boxes}}" as="b" hint-placeholder-count="4">
+      <div style="background: {{b.bg}}; border: 2.5px solid #17130d; border-radius: 22px; box-shadow: 6px 6px 0 #17130d; padding: 26px 22px; display: flex; flex-direction: column; gap: 18px; position: relative; overflow: hidden">
+        <span style="position: absolute; top: 18px; right: 16px; background: #fdf7ea; border: 2px solid #17130d; border-radius: 999px; padding: 4px 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1.5px; transform: rotate(6deg)">{{b.sticker}}</span>
+        <div style="position: relative; height: 330px; margin-top: 18px">
+          <div style="position: absolute; left: 36px; top: 30px; width: 232px; height: 56px; background: #2b2620; border: 2.5px solid #17130d; box-sizing: border-box; transform: skewX(-34deg); transform-origin: bottom left"></div>
+          <div style="position: absolute; left: 0; top: 86px; width: 232px; height: 220px; background: #17130d; border: 2.5px solid #17130d; box-sizing: border-box; border-radius: 0 0 6px 6px; box-shadow: 8px 8px 0 rgba(23,19,13,0.35); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+            <dc-import name="Seal" num="{{b.num}}" label="{{b.label}}" ring="{{b.ring}}" size="112" uid="{{b.uid}}" hint-size="112px,112px"></dc-import>
+            <div style="color: #fdf7ea; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 2px">GENUS</div>
+          </div>
+          <div style="position: absolute; left: 0; top: 248px; width: 232px; height: 30px; background: {{b.band}}; border-top: 2.5px solid #17130d; border-bottom: 2.5px solid #17130d; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 2px">{{b.bandText}}</div>
+        </div>
+        <div style="background: #fdf7ea; border: 2.5px solid #17130d; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; margin-top: auto">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: 1px">{{b.name}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px">{{b.price}}</span></div>
+          <div style="font-size: 14px">{{b.desc}}</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5b5346">{{b.size}}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; font-size: 14px; line-height: 1.5">
+    <div><b>Inside:</b> kraft tissue, a card per coffee, the "Cum ți s-a părut?" QR card.</div>
+    <div><b>Print:</b> one black mailer; the belly band and seal are stickers in 4 colours.</div>
+    <div><b>Locker fit:</b> check both sizes against easybox S/M with Sameday.</div>
+    <div><b>Status:</b> concept; sizes are proposals for the box printer.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1600,"height":960}}'>
+class Component extends DCLogic {
+renderVals() {
+return { boxes: [
+{ name: 'DUO', price: '159 lei', desc: '2 × 250g · 1 invitat + Genus', size: 'propunere 22 × 16 × 8 cm', bg: '#17a05b', band: '#17a05b', bandText: 'DUO · 2 PRĂJITORII', ring: '#17a05b', num: '2', label: 'PRĂJITORII', uid: 'bx-duo', sticker: 'LUNAR / 2 LUNI' },
+{ name: 'TRIO', price: '219 lei', desc: '3 × 250g · 2 invitați + Genus', size: 'propunere 28 × 18 × 9 cm', bg: '#ff5140', band: '#ff5140', bandText: 'TRIO · 3 PRĂJITORII', ring: '#ff5140', num: '3', label: 'PRĂJITORII', uid: 'bx-trio', sticker: 'CEA MAI ALEASĂ' },
+{ name: 'RESERVE', price: '259 lei', desc: 'Trio cu un micro-lot rar', size: 'propunere 28 × 18 × 9 cm', bg: '#f5a623', band: '#f5a623', bandText: 'RESERVE · MICRO-LOT', ring: '#f5a623', num: 'R', label: 'MICRO-LOT', uid: 'bx-res', sticker: 'RAR!' },
+{ name: 'CADOU', price: '259 lei', desc: 'Trio · bilet de mână · fără preț', size: 'aceeași cutie + panglică', bg: '#ff7fb0', band: '#ff7fb0', bandText: 'PENTRU TINE ♥', ring: '#ff7fb0', num: '♥', label: 'CADOU', uid: 'bx-gift', sticker: 'FĂRĂ ABONAMENT' }
+] };
+}
+}
+</script>
+</body>
+</html>

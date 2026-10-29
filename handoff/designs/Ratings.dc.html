@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus ranking of Romanian roasters</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0;background:#fdf7ea}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%; min-height: 1000px">
+  <dc-import name="Nav" hint-size="100%,112px"></dc-import>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 56px 24px; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 680px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">CLASAMENTUL GENUS · 2027</div>
+        <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 600; line-height: 1.05">Cele mai bine notate cafele românești</h1>
+        <p style="margin: 0; font-size: 17px; line-height: 1.5; color: #5b5346">Notele vin doar de la abonați care au primit cafeaua în cutie. O cafea intră în clasament după cel puțin [N] note.</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: 2.5px solid #17130d; background: #17130d; color: #fdf7ea; font: 700 14px 'Space Grotesk', sans-serif">Cafele</button>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: 2.5px solid #17130d; background: #ffffff; color: #17130d; font: 700 14px 'Space Grotesk', sans-serif">Prăjitorii</button>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: 2.5px solid #17130d; background: #ffffff; color: #17130d; font: 700 14px 'Space Grotesk', sans-serif">Filtru</button>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: 2.5px solid #17130d; background: #ffffff; color: #17130d; font: 700 14px 'Space Grotesk', sans-serif">Espresso</button>
+      </div>
+    </div>
+    <div style="overflow-x: auto; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; background: #ffffff">
+      <table style="width: 100%; min-width: 760px; border-collapse: collapse; font-size: 15px">
+        <thead>
+          <tr style="background: #17130d; color: #fdf7ea; text-align: left">
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px">#</th>
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px">CAFEA</th>
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px">PRĂJITORIE · ORAȘ</th>
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px">NOTE DE GUST</th>
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-align: right">NOTA</th>
+            <th style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-align: right">NR. NOTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <tr style="border-top: 1px solid #f6efdd">
+              <td style="padding: 16px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">{{r.rank}}</td>
+              <td style="padding: 16px; font-weight: 600">{{r.coffee}}</td>
+              <td style="padding: 16px; color: #5b5346">{{r.roaster}}</td>
+              <td style="padding: 16px; color: #5b5346">{{r.notes}}</td>
+              <td style="padding: 16px; text-align: right; font-family: 'IBM Plex Mono', monospace">★ în curând</td>
+              <td style="padding: 16px; text-align: right; font-family: 'IBM Plex Mono', monospace">[—]</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px">
+      <div style="flex: 1 1 360px; background: #ff7fb0; border: 2.5px solid #17130d; box-shadow: 4px 4px 0 #17130d; border-radius: 18px; padding: 24px; font-size: 15px; line-height: 1.5"><strong>Cum calculăm:</strong> media notelor de 1–5 stele, doar de la cei care au primit cafeaua, cu cel puțin [N] note. Nu există note plătite sau de la prăjitorii înșiși.</div>
+      <div style="flex: 1 1 360px; background: #17130d; color: #fdf7ea; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 8px"><div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Vrei să notezi și tu?</div><div style="color: #d9c3a0; font-size: 15px">Primești trei cafele pe lună și votul tău contează în clasament.</div><a href="/Plan.dc.html" style="color: #fdf7ea; font-weight: 600">Alege cutia →</a></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return { rows: [['Rwanda Simbi Kinazi','Genus Coffee · Oradea','fructe roșii, scorțișoară'],['Etiopia Guji','Narcoffee Roasters · Cluj-Napoca','[note]'],['Columbia Huila','Yume Coffee Roasters · Iași','[note]'],['Kenya','MABÓ Coffee · București','[note]'],['Brazilia','Hotspot Coffee · Timișoara','[note]'],['Guatemala','Black Habit · Sibiu','[note]']].map((r, i) => ({ rank: i + 1, coffee: r[0], roaster: r[1], notes: r[2] })) }; }
+}
+</script>
+</body>
+</html>

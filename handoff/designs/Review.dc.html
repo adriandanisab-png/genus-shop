@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Rate your Genus box on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="width: 390px; height: 1240px; box-sizing: border-box; background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="background: #17130d; color: #fdf7ea; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 500">Genus</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 3px">COFFEE BOX</span></div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; line-height: 1.1">Cum ți s-a părut cutia de decembrie?</div>
+    <div style="font-size: 14px; color: #d9c3a0">20 de secunde. Notele tale aleg cutia de luna viitoare.</div>
+  </div>
+
+  <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px">
+    <sc-for list="{{coffees}}" as="c" hint-placeholder-count="3">
+      <div style="background: #ffffff; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 2px; color: #5b5346">{{c.tag}}</div>
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">{{c.name}}</div>
+        </div>
+        <div style="display: flex; gap: 4px" role="group" aria-label="Nota pentru {{c.name}}">
+          <sc-for list="{{c.stars}}" as="s" hint-placeholder-count="5">
+            <button type="button" onClick="{{s.pick}}" aria-label="{{s.aria}}" style="width: 48px; height: 48px; border: 0; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center">
+              <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z" fill="{{s.fill}}" stroke="#17130d" stroke-width="1.4" stroke-linejoin="round"></path></svg>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{c.tags}}" as="t" hint-placeholder-count="6">
+            <button type="button" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{c.low}}" hint-placeholder-val="{{ false }}">
+          <div style="background: #f6efdd; border-radius: 14px; padding: 10px 12px; font-size: 13px; line-height: 1.4">Ne pare rău. Primești 25 lei reducere la cutia următoare și nu-ți mai trimitem stilul acesta.</div>
+        </sc-if>
+      </div>
+    </sc-for>
+
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Altceva? (opțional)<textarea rows="3" placeholder="Ce ți-a plăcut, ce nu…" style="padding: 12px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 15px 'Instrument Sans', sans-serif; background: #ffffff"></textarea></label>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Ce prăjitorie vrei să vezi în cutie?<input type="text" placeholder="Numele prăjitoriei, orașul" style="min-height: 48px; padding: 0 12px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 15px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+    <button type="button" style="min-height: 52px; border: 2.5px solid #17130d; background: #ff5140; color: #17130d; border-radius: 999px; box-shadow: 3px 3px 0 #17130d; text-transform: uppercase; letter-spacing: 1.5px; font: 700 17px 'Space Grotesk', sans-serif; cursor: pointer">Trimite notele</button>
+    <div style="font-size: 12px; color: #5b5346; text-align: center">Media notelor apare public în clasamentul Genus, fără numele tău.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { r: { a: 4, b: 0, c: 0 }, t: { a: { Fructat: true } } }; }
+renderVals() {
+const C = [['a', 'INVITAT 1 · CLUJ-NAPOCA', 'Etiopia Guji · Narcoffee'], ['b', 'INVITAT 2 · IAȘI', 'Columbia Huila · Yume'], ['c', 'CASA · ORADEA', 'Rwanda Simbi Kinazi · Genus']];
+const TAGS = ['Fructat', 'Ciocolatos', 'Floral', 'Dulce', 'Acid', 'Amar'];
+const r = this.state.r, t = this.state.t;
+return { coffees: C.map((c) => {
+const id = c[0], val = r[id] || 0, sel = t[id] || {};
+return {
+tag: c[1], name: c[2], low: val > 0 && val <= 2,
+stars: [1, 2, 3, 4, 5].map((n) => ({ fill: n <= val ? '#ff5140' : '#ffffff', aria: n + ' din 5', pick: () => this.setState({ r: Object.assign({}, r, { [id]: n }) }) })),
+tags: TAGS.map((g) => ({ label: g, style: 'min-height: 36px; padding: 0 12px; border-radius: 999px; cursor: pointer; font: 500 13px Instrument Sans, sans-serif; border: 2.5px solid #17130d; color: ' + (sel[g] ? '#fdf7ea' : '#17130d') + '; background: ' + (sel[g] ? '#17130d' : '#ffffff'), pick: () => this.setState({ t: Object.assign({}, t, { [id]: Object.assign({}, sel, { [g]: !sel[g] }) }) }) }))
+};
+}) };
+}
+}
+</script>
+</body>
+</html>

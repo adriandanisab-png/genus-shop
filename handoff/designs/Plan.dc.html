@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box choose and pay</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0;background:#fdf7ea}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%; min-height: 1000px">
+  <dc-import name="Nav" hint-size="100%,112px"></dc-import>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px; display: flex; flex-wrap: wrap; gap: 40px">
+    <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 32px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 600">Alege cutia</h1>
+
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">1 · CUTIA</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
+          <sc-for list="{{boxes}}" as="b" hint-placeholder-count="3">
+            <button type="button" onClick="{{b.pick}}" style="{{b.style}}">
+              <span style="display: block; height: 8px; background: {{b.color}}; border-radius: 3px; margin-bottom: 10px"></span>
+              <span style="display: block; font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700">{{b.name}}</span>
+              <span style="display: block; font-size: 14px; color: #5b5346">{{b.desc}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">2 · CÂT DE DES</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <sc-for list="{{freqs}}" as="f" hint-placeholder-count="3">
+            <button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button>
+          </sc-for>
+        </div>
+        <div style="font-size: 14px; color: #5b5346">{{freqNote}}</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">3 · LIVRARE</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Nume complet<input type="text" placeholder="Ana Popescu" style="min-height: 48px; padding: 0 14px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 16px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Easybox / FAN Box<input type="text" placeholder="Caută după oraș sau stradă" style="min-height: 48px; padding: 0 14px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 16px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Email<input type="email" placeholder="ana@exemplu.ro" style="min-height: 48px; padding: 0 14px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 16px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Telefon (pentru SMS de livrare)<input type="tel" placeholder="07xx xxx xxx" style="min-height: 48px; padding: 0 14px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 16px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex: 1 1 320px; min-width: 0; align-self: flex-start; background: #ffffff; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; padding: 26px; display: flex; flex-direction: column; gap: 14px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 3px; color: #5b5346">COMANDA TA</div>
+      <div style="display: flex; justify-content: space-between; font-size: 16px"><span>{{boxName}} · {{freqLabel}}</span><span>{{basePrice}} lei</span></div>
+      <sc-if value="{{hasIntro}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; justify-content: space-between; font-size: 16px; color: #17a05b"><span>Prima cutie Trio (până la 31.01.2027)</span><span>−{{introOff}} lei</span></div>
+      </sc-if>
+      <div style="display: flex; justify-content: space-between; font-size: 16px"><span>Livrare la easybox</span><span>gratuit</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid #17130d; padding-top: 14px"><span style="font-weight: 600">Plătești azi</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600">{{today}} lei</span></div>
+      <div style="font-size: 14px; color: #5b5346; line-height: 1.5">{{afterNote}}</div>
+      <button type="button" style="min-height: 52px; border: 2.5px solid #17130d; background: #ff5140; color: #17130d; border-radius: 999px; box-shadow: 3px 3px 0 #17130d; text-transform: uppercase; letter-spacing: 1.5px; font: 700 17px 'Space Grotesk', sans-serif; cursor: pointer">Plătește cu cardul</button>
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5b5346">
+        <span>✓ Plată securizată prin Stripe · TVA inclus</span>
+        <span>✓ Vezi cafelele cu 5 zile înainte; schimbi sau sari luna</span>
+        <span>✓ Nu ți-a plăcut o cafea? 25 lei reducere la următoarea</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { box: 'Trio', freq: 'lunar' }; }
+renderVals() {
+const B = { Duo: { sub: 159, once: 179, color: '#17a05b', desc: '2 × 250g' }, Trio: { sub: 219, once: 239, color: '#c22a1c', desc: '3 × 250g' }, Reserve: { sub: 259, once: null, color: '#f5a623', desc: 'Trio + micro-lot' } };
+const box = this.state.box;
+const freq = (box === 'Reserve' && this.state.freq === 'once') ? 'lunar' : this.state.freq;
+const card = (sel) => 'text-align: left; padding: 16px; border-radius: 18px; cursor: pointer; color: #17130d; font-family: Instrument Sans, sans-serif; min-height: 110px; background: ' + (sel ? '#f6efdd' : '#ffffff') + '; border: ' + (sel ? '3px solid #17130d; box-shadow: 4px 4px 0 #ff5140' : '2.5px solid #17130d');
+const pill = (sel) => 'min-height: 48px; padding: 0 20px; border-radius: 999px; cursor: pointer; font: 600 15px Instrument Sans, sans-serif; color: ' + (sel ? '#fdf7ea' : '#17130d') + '; background: ' + (sel ? '#17130d' : '#ffffff') + '; border: 2.5px solid #17130d';
+const F = [['lunar', 'Lunar'], ['2luni', 'La 2 luni'], ['once', 'O singură dată']].filter((f) => !(box === 'Reserve' && f[0] === 'once'));
+const base = freq === 'once' ? B[box].once : B[box].sub;
+const hasIntro = box === 'Trio';
+const today = hasIntro ? 199 : base;
+const freqLabel = { lunar: 'lunar', '2luni': 'la 2 luni', once: 'o singură dată' }[freq];
+return {
+boxes: Object.keys(B).map((k) => ({ name: k, desc: B[k].desc, color: B[k].color, style: card(k === box), pick: () => this.setState({ box: k }) })),
+freqs: F.map((f) => ({ label: f[1], style: pill(f[0] === freq), pick: () => this.setState({ freq: f[0] }) })),
+freqNote: freq === 'once' ? 'Fără abonament. Costă 20 lei mai mult pe cutie.' : 'Abonament: pauză, schimbare sau anulare oricând, dintr-un click.',
+boxName: box, freqLabel: freqLabel, basePrice: base,
+hasIntro: hasIntro, introOff: base - 199, today: today,
+afterNote: freq === 'once' ? 'O singură plată. Nu te înscriem în niciun abonament.' : 'Apoi ' + B[box].sub + ' lei ' + (freq === 'lunar' ? 'pe lună' : 'la 2 luni') + '. Primești email cu 5 zile înainte de fiecare plată.'
+};
+}
+}
+</script>
+</body>
+</html>

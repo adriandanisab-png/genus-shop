@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box partner roasters</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0;background:#fdf7ea}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%; min-height: 1100px">
+  <dc-import name="Nav" hint-size="100%,112px"></dc-import>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 56px 24px; display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; flex-direction: column; gap: 10px; max-width: 720px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">PRĂJITORIILE PARTENERE</div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 600; line-height: 1.05">Oamenii din spatele cutiei</h1>
+      <p style="margin: 0; font-size: 17px; line-height: 1.5; color: #5b5346">Fiecare lună aduce două prăjitorii românești invitate lângă Genus. Aici le găsești pe toate, cu link direct către magazinul lor.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px">
+      <sc-for list="{{roasters}}" as="r" hint-placeholder-count="6">
+        <div style="background: #ffffff; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 14px">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: {{r.bg}}; color: #fdf7ea; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">{{r.initial}}</div>
+            <div style="display: flex; flex-direction: column; gap: 2px"><div style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600">{{r.name}}</div><div style="font-size: 14px; color: #5b5346">{{r.town}}</div></div>
+          </div>
+          <div style="font-size: 15px; line-height: 1.5">[Povestea lor în două rânduri, scrisă împreună cu ei.]</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f6efdd; padding-top: 12px; font-size: 14px"><span style="font-family: 'IBM Plex Mono', monospace">{{r.months}}</span><a href="#shop" style="font-weight: 600">Magazinul lor →</a></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px">
+      <div style="flex: 1 1 380px; background: #17130d; color: #fdf7ea; border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 3px; color: #d9c3a0">PENTRU PRĂJITORII</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 600">Vrei să fii în cutie?</div>
+        <div style="font-size: 15px; line-height: 1.5; color: #d9c3a0">Comandă lunară fixă, plată în 15 zile, povestea și logo-ul tău pe card, și notele abonaților pentru cafeaua ta. Fără exclusivitate.</div>
+        <a href="#apply" style="align-self: flex-start; background: #fdf7ea; color: #17130d; text-decoration: none; font-weight: 600; padding: 14px 22px; border-radius: 14px">Aplică ca partener</a>
+      </div>
+      <div style="flex: 1 1 380px; background: #f5a623; border: 2.5px solid #17130d; box-shadow: 4px 4px 0 #17130d; border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600">Ai o prăjitorie preferată?</div>
+        <div style="font-size: 15px; line-height: 1.5">Spune-ne pe cine vrei în cutie. Le scriem noi.</div>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Prăjitoria și orașul<input type="text" placeholder="ex. Manole Coffee, Brașov" style="min-height: 48px; padding: 0 14px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 16px 'Instrument Sans', sans-serif; background: #ffffff"></label>
+        <button type="button" style="align-self: flex-start; min-height: 48px; padding: 0 22px; border: 2.5px solid #17130d; background: #ff5140; color: #17130d; border-radius: 999px; box-shadow: 3px 3px 0 #17130d; text-transform: uppercase; letter-spacing: 1.5px; font: 700 16px 'Space Grotesk', sans-serif">Nominalizează</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+const bgs = ['#17130d', '#17a05b', '#c22a1c', '#7a4a2b', '#f5a623', '#2b2620'];
+return { roasters: [
+{ name: 'Genus Coffee', town: 'Oradea · casa', initial: 'G', bg: '#ff5140', months: 'în fiecare cutie' },
+{ name: 'Narcoffee Roasters', town: 'Cluj-Napoca', initial: 'N', bg: '#17a05b', months: 'decembrie 2026' },
+{ name: 'Yume Coffee Roasters', town: 'Iași', initial: 'Y', bg: '#f5a623', months: 'decembrie 2026' },
+{ name: 'MABÓ Coffee', town: 'București', initial: 'M', bg: '#ff7fb0', months: 'noiembrie 2026' },
+{ name: 'Hotspot Coffee', town: 'Timișoara', initial: 'H', bg: '#3f74ff', months: 'noiembrie 2026' },
+{ name: 'Black Habit', town: 'Sibiu', initial: 'B', bg: '#17130d', months: 'ianuarie 2027' }
+] };
+}
+}
+</script>
+</body>
+</html>

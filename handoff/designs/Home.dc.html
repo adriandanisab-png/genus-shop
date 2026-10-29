@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box shop homepage</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>body{margin:0;background:#fdf7ea}a{color:#17130d}a:hover{color:#e23b2b}</style>
+</helmet>
+<div style="background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%">
+  <dc-import name="Nav" hint-size="100%,112px"></dc-import>
+
+  <div style="background: #17130d; color: #fdf7ea; text-align: center">
+    <div style="max-width: 1000px; margin: 0 auto; padding: 80px 24px 88px; display: flex; flex-direction: column; align-items: center; gap: 24px">
+      <span style="background: #ff7fb0; color: #17130d; border: 2.5px solid #17130d; border-radius: 999px; padding: 6px 16px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; transform: rotate(-4deg)">3 PRĂJITORII · O CUTIE · LUNAR</span>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 80px; font-weight: 700; line-height: 0.98; letter-spacing: 2.5px">CAFEA BUNĂ, FĂRĂ BĂTĂI DE CAP.</h1>
+      <p style="margin: 0; font-size: 19px; line-height: 1.55; max-width: 560px">Alegem cafeaua după cum o prepari tu, o primești la easybox proaspăt prăjită, o notezi, și luna viitoare e și mai bună.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: 8px">
+        <a href="/Quiz.dc.html" style="background: #ff5140; color: #17130d; text-decoration: none; border: 2.5px solid #17130d; border-radius: 999px; padding: 16px 30px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.5px; box-shadow: 3px 3px 0 #fdf7ea">FĂ QUIZ-UL →</a>
+        <a href="/Gift.dc.html" style="background: #f5a623; color: #17130d; text-decoration: none; border: 2.5px solid #17130d; border-radius: 999px; padding: 16px 30px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.5px; box-shadow: 3px 3px 0 #fdf7ea">TRIMITE CADOU</a>
+      </div>
+      <div style="font-size: 14px; color: #d9c3a0">Prima cutie Trio 199 lei, cu sau fără abonament, până pe 31 ianuarie 2027.</div>
+    </div>
+  </div>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 72px 24px; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px"><h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; letter-spacing: 1px">ALEGE-ȚI CUTIA</h2><a href="/Plan.dc.html" style="color: #e23b2b; font-weight: 600">Compară toate →</a></div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px">
+      <sc-for list="{{boxes}}" as="b" hint-placeholder-count="4">
+        <div style="background: #ffffff; border: 2.5px solid #17130d; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 4px 4px 0 #17130d">
+          <div style="background: {{b.color}}; border-bottom: 2.5px solid #17130d; height: 150px; display: flex; align-items: center; justify-content: center; position: relative">
+            <dc-import name="Seal" num="{{b.num}}" label="{{b.label}}" ring="{{b.ring}}" size="110" uid="{{b.uid}}" hint-size="110px,110px"></dc-import>
+          </div>
+          <div style="padding: 18px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1">
+            <span style="align-self: flex-start; background: {{b.color}}; border: 2px solid #17130d; border-radius: 999px; padding: 4px 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1.5px">{{b.badge}}</span>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 1px">{{b.name}}</div>
+            <div style="font-size: 14px; color: #5b5346">{{b.desc}}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 17px">{{b.price}}</span>
+              <a href="{{b.href}}" style="background: #17130d; color: #fdf7ea; text-decoration: none; border-radius: 999px; padding: 10px 16px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">ALEGE +</a>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background: #ff7fb0; border-top: 2.5px solid #17130d; border-bottom: 2.5px solid #17130d">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 72px 24px; display: flex; flex-direction: column; gap: 32px">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 1px">CUM MERGE</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
+        <div style="background: #fdf7ea; border: 2.5px solid #17130d; border-radius: 18px; padding: 24px; box-shadow: 4px 4px 0 #17130d; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: #e23b2b">01</span><div style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">SPUNE-NE CUM BEI CAFEAUA</div><div style="line-height: 1.5">V60, espresso sau AeroPress, cât bei pe săptămână. Un minut.</div></div>
+        <div style="background: #fdf7ea; border: 2.5px solid #17130d; border-radius: 18px; padding: 24px; box-shadow: 4px 4px 0 #17130d; display: flex; flex-direction: column; gap: 10px; transform: rotate(-1deg)"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: #e23b2b">02</span><div style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">PRIMEȘTI CUTIA LA EASYBOX</div><div style="line-height: 1.5">Data prăjirii pe fiecare pungă. Cu 5 zile înainte vezi cafelele și poți schimba sau sări luna.</div></div>
+        <div style="background: #fdf7ea; border: 2.5px solid #17130d; border-radius: 18px; padding: 24px; box-shadow: 4px 4px 0 #17130d; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: #e23b2b">03</span><div style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">NOTEZI, NOI ÎNVĂȚĂM</div><div style="line-height: 1.5">Scanezi QR-ul și dai note. Nu ți-a plăcut o cafea? 25 lei reducere data viitoare.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1200px; margin: 0 auto; padding: 72px 24px; display: flex; flex-wrap: wrap; gap: 40px; align-items: center">
+    <div style="flex: 1 1 340px; display: flex; justify-content: center">
+      <img src="/_blob/6098692ffe703715984a1c33dbd5b53e" alt="Genus coffee bag" style="width: 100%; max-width: 380px; height: 420px; object-fit: cover; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 6px 6px 0 #17130d">
+    </div>
+    <div style="flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+      <span style="align-self: flex-start; background: #f5a623; border: 2.5px solid #17130d; border-radius: 999px; padding: 6px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; transform: rotate(3deg)">CUTIA LUNII</span>
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700; letter-spacing: 1px; line-height: 1">NATURAL, SPĂLAT, HONEY</h2>
+      <p style="margin: 0; font-size: 18px; line-height: 1.55">Narcoffee Roasters din Cluj-Napoca și Yume Coffee Roasters din Iași, plus Rwanda Simbi Kinazi de la noi din Oradea. Prăjite între 1 și 5 decembrie, livrate până pe 12 decembrie.</p>
+      <a href="/ThisMonth.dc.html" style="align-self: flex-start; background: #ff5140; color: #17130d; text-decoration: none; border: 2.5px solid #17130d; border-radius: 999px; padding: 14px 26px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.5px; box-shadow: 3px 3px 0 #17130d">VEZI CAFELELE →</a>
+    </div>
+  </div>
+
+  <div style="background: #17130d; color: #fdf7ea">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 32px; display: flex; flex-wrap: wrap; gap: 32px; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 1px">GENUS</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 3px; color: #d9c3a0">COFFEE BOX · ORADEA</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 40px; font-size: 14px">
+        <div style="display: flex; flex-direction: column; gap: 8px"><span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; color: #d9c3a0">CUTII</span><a href="/Plan.dc.html" style="color: #fdf7ea">Abonament</a><a href="/Gift.dc.html" style="color: #fdf7ea">Cadou</a></div>
+        <div style="display: flex; flex-direction: column; gap: 8px"><span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; color: #d9c3a0">AJUTOR</span><a href="#faq" style="color: #fdf7ea">Întrebări</a><a href="#termeni" style="color: #fdf7ea">Termeni · ANPC · SOL</a></div>
+        <div style="display: flex; flex-direction: column; gap: 8px"><span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; color: #d9c3a0">GĂSEȘTE-NE</span><span>Oradea, România</span><span>@genuscoffee</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+return { boxes: [
+{ name: 'DUO', badge: '2 × 250G', desc: '1 prăjitorie invitată + Genus. Lunar sau la 2 luni.', price: '159 lei', color: '#17a05b', ring: '#fdf7ea', num: '2', label: 'PRĂJITORII', uid: 'h-duo', href: '/Plan.dc.html' },
+{ name: 'TRIO', badge: 'CEA MAI ALEASĂ', desc: '2 prăjitorii invitate + Genus. Prima cutie 199 lei.', price: '219 lei', color: '#ff5140', ring: '#fdf7ea', num: '3', label: 'PRĂJITORII', uid: 'h-trio', href: '/Plan.dc.html' },
+{ name: 'RESERVE', badge: 'MICRO-LOT', desc: 'Trio cu o cafea rară, greu de găsit.', price: '259 lei', color: '#f5a623', ring: '#fdf7ea', num: 'R', label: 'MICRO-LOT', uid: 'h-res', href: '/Plan.dc.html' },
+{ name: 'CADOU', badge: 'FĂRĂ ABONAMENT', desc: 'Trio în cutie de cadou, cu bilet scris de mână.', price: '259 lei', color: '#ff7fb0', ring: '#fdf7ea', num: '♥', label: 'CADOU', uid: 'h-gift', href: '/Gift.dc.html' }
+] };
+}
+}
+</script>
+</body>
+</html>

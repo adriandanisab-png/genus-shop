@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box my account</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0;background:#fdf7ea}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="background: #fdf7ea; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%; min-height: 1200px">
+  <dc-import name="Nav" hint-size="100%,112px"></dc-import>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #5b5346">CONTUL MEU</div><h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 600">Bună, [Prenume]</h1></div>
+      <div style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 2.5px solid #17130d; border-radius: 999px; padding: 8px 16px; font-size: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #c22a1c"></span><span><strong>Trio</strong> · lunar · 219 lei</span></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px">
+      <div style="flex: 999 1 600px; min-width: 0; background: #17130d; color: #fdf7ea; border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 3px; color: #d9c3a0">URMĂTOAREA CUTIE</div><div style="font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 600">Sosește 12 decembrie</div></div>
+          <div style="display: flex; flex-direction: column; gap: 4px; text-align: right"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 3px; color: #d9c3a0">PLATĂ</div><div style="font-size: 16px">5 decembrie · 219 lei</div><div style="font-size: 13px; color: #ff5140">Poți schimba până pe 30 noiembrie</div></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{lineup}}" as="c" hint-placeholder-count="3">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: #2b2620; border-radius: 14px; padding: 14px 16px">
+              <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 2px; color: #d9c3a0">{{c.tag}}</span><span style="font-weight: 600; font-size: 16px">{{c.name}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d9c3a0">prăjit [DD.MM] · {{c.fit}}</span></div>
+              <button type="button" style="min-height: 44px; padding: 0 16px; border: 2.5px solid #fdf7ea; background: transparent; color: #fdf7ea; border-radius: 999px; text-transform: uppercase; letter-spacing: 1.5px; font: 700 14px 'Space Grotesk', sans-serif">Schimbă</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <button type="button" style="min-height: 48px; padding: 0 20px; border: 2.5px solid #17130d; background: #f5a623; color: #17130d; border-radius: 999px; box-shadow: 3px 3px 0 #fdf7ea; text-transform: uppercase; letter-spacing: 1.5px; font: 700 15px 'Space Grotesk', sans-serif">Sari peste luna aceasta</button>
+          <button type="button" style="min-height: 48px; padding: 0 20px; border: 2.5px solid #fdf7ea; background: transparent; color: #fdf7ea; border-radius: 999px; text-transform: uppercase; letter-spacing: 1.5px; font: 700 15px 'Space Grotesk', sans-serif">Schimbă easybox-ul</button>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <div style="background: #ffffff; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Abonamentul meu</div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Cutia<select style="min-height: 46px; padding: 0 12px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 15px 'Instrument Sans', sans-serif; background: #ffffff"><option>Duo · 159 lei</option><option selected>Trio · 219 lei</option><option>Reserve · 259 lei</option></select></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Frecvența<select style="min-height: 46px; padding: 0 12px; border: 2.5px solid #17130d; border-radius: 14px; font: 400 15px 'Instrument Sans', sans-serif; background: #ffffff"><option selected>Lunar</option><option>La 2 luni</option></select></label>
+          <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px"><a href="#portal">Card și facturi</a><a href="#portal">Pune pe pauză</a><a href="#portal" style="color: #5b5346">Anulează</a></div>
+        </div>
+        <div style="background: #ff7fb0; border: 2.5px solid #17130d; box-shadow: 4px 4px 0 #17130d; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Profilul tău de gust</div>
+          <div style="font-size: 14px; line-height: 1.5">V60 · fructat, luminos · neagră · 5–10 cești/săpt.</div>
+          <a href="/Quiz.dc.html" style="font-size: 14px; font-weight: 600">Refă quiz-ul →</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 600">Cafelele mele notate</h2>
+      <div style="overflow-x: auto; border: 2.5px solid #17130d; border-radius: 18px; box-shadow: 4px 4px 0 #17130d; background: #ffffff">
+        <table style="width: 100%; min-width: 680px; border-collapse: collapse; font-size: 15px">
+          <thead><tr style="text-align: left; border-bottom: 1.5px solid #17130d"><th style="padding: 12px 16px">Luna</th><th style="padding: 12px 16px">Cafea</th><th style="padding: 12px 16px">Nota mea</th><th style="padding: 12px 16px"></th></tr></thead>
+          <tbody>
+            <sc-for list="{{past}}" as="p" hint-placeholder-count="3">
+              <tr style="border-top: 1px solid #f6efdd"><td style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{p.month}}</td><td style="padding: 14px 16px">{{p.coffee}}</td><td style="padding: 14px 16px; font-family: 'IBM Plex Mono', monospace">{{p.stars}}</td><td style="padding: 14px 16px; text-align: right"><a href="#reorder" style="font-weight: 600">{{p.action}}</a></td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size: 14px; color: #5b5346">Cafelele de 5★ se pot recomanda ca pungă întreagă, la prețul prăjitoriei, în cutia următoare.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+lineup: [{ tag: 'INVITAT 1 · CLUJ-NAPOCA', name: 'Etiopia Guji · Narcoffee Roasters', fit: 'potrivită pentru V60' }, { tag: 'INVITAT 2 · IAȘI', name: 'Columbia Huila · Yume Coffee Roasters', fit: 'potrivită pentru V60' }, { tag: 'CASA · ORADEA', name: 'Rwanda Simbi Kinazi · Genus', fit: 'potrivită pentru V60' }],
+past: [{ month: 'noiembrie', coffee: 'Kenya · MABÓ Coffee, București', stars: '★★★★★', action: 'Comandă din nou' }, { month: 'noiembrie', coffee: 'Brazilia · Hotspot Coffee, Timișoara', stars: '★★★★☆', action: 'Comandă din nou' }, { month: 'noiembrie', coffee: 'El Triunfo, Columbia · Genus', stars: '★★☆☆☆', action: '25 lei aplicat' }]
+};
+}
+}
+</script>
+</body>
+</html>

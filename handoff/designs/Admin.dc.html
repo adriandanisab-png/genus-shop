@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Genus Coffee Box admin monthly cycle</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Instrument+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>h1,h2{text-transform:uppercase;letter-spacing:1.5px;font-weight:700 !important}body{margin:0;background:#f6efdd}a{color:#c22a1c}a:hover{color:#17130d}</style>
+</helmet>
+<div style="background: #f6efdd; color: #17130d; font-family: 'Instrument Sans', sans-serif; width: 100%; min-height: 1100px">
+  <div style="background: #17130d; color: #fdf7ea">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+      <div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 500">Genus</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 3px; color: #d9c3a0">ADMIN · BOX</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px"><a href="#cycle" style="color: #fdf7ea">Monthly cycle</a><a href="#subs" style="color: #d9c3a0">Subscribers</a><a href="#coffees" style="color: #d9c3a0">Coffees</a><a href="#roasters" style="color: #d9c3a0">Roasters</a><a href="#ratings" style="color: #d9c3a0">Ratings</a></div>
+    </div>
+  </div>
+  <div id="cycle" style="max-width: 1200px; margin: 0 auto; padding: 36px 24px; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600">December 2026 box · cycle</h1>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="6">
+          <span style="{{s.style}}">{{s.label}}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="5">
+        <div style="background: #ffffff; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 4px; border-top: 6px solid {{k.color}}">
+          <span style="font-size: 13px; color: #5b5346">{{k.label}}</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 600">[n]</span>
+          <span style="font-size: 12px; color: #5b5346">{{k.note}}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 18px">
+      <div style="flex: 999 1 560px; min-width: 0; background: #ffffff; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600">Bags to order (send by the 10th)</h2><button type="button" style="min-height: 40px; padding: 0 14px; border: 2.5px solid #17130d; background: #ffffff; border-radius: 14px; font: 700 13px 'Space Grotesk', sans-serif">Export order sheet</button></div>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px">
+            <thead><tr style="text-align: left; border-bottom: 1.5px solid #17130d"><th style="padding: 10px 8px">Roaster</th><th style="padding: 10px 8px">Coffee</th><th style="padding: 10px 8px; text-align: right">Bags</th><th style="padding: 10px 8px; text-align: right">Price/bag</th><th style="padding: 10px 8px">Roast by</th><th style="padding: 10px 8px">Status</th></tr></thead>
+            <tbody>
+              <sc-for list="{{orders}}" as="o" hint-placeholder-count="4">
+                <tr style="border-top: 1px solid #f6efdd"><td style="padding: 12px 8px; font-weight: 600">{{o.roaster}}</td><td style="padding: 12px 8px">[Coffee]</td><td style="padding: 12px 8px; text-align: right; font-family: 'IBM Plex Mono', monospace">[n]</td><td style="padding: 12px 8px; text-align: right; font-family: 'IBM Plex Mono', monospace">{{o.price}}</td><td style="padding: 12px 8px; font-family: 'IBM Plex Mono', monospace">[DD.MM]</td><td style="padding: 12px 8px"><span style="{{o.pill}}">{{o.status}}</span></td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size: 13px; color: #5b5346">Bag counts = active boxes − skips + one spare per 20 boxes. Swaps move a bag to the month's alternate coffee.</div>
+      </div>
+      <div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div style="background: #ffffff; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Packing list</h2>
+          <div style="font-size: 14px; line-height: 1.6">Duo boxes: [n]<br>Trio boxes: [n]<br>Reserve boxes: [n]<br>Gift boxes (note + ribbon): [n]<br>One-off orders: [n]</div>
+          <button type="button" style="min-height: 44px; border: 2.5px solid #17130d; background: #17130d; color: #fdf7ea; border-radius: 999px; box-shadow: 3px 3px 0 #ff5140; text-transform: uppercase; letter-spacing: 1.5px; font: 700 14px 'Space Grotesk', sans-serif">Print labels &amp; cards</button>
+        </div>
+        <div style="background: #17130d; color: #fdf7ea; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Last month's ratings</h2>
+          <div style="font-size: 14px; line-height: 1.6; color: #d9c3a0">Response rate: [n]%<br>Average: ★ [—]<br>1–2★ credits issued: [n] × 25 lei<br>Roaster nominations: [n]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+const S = [['1–5 Pick coffees', 'done'], ['5 Billing', 'done'], ['10 Order bags', 'now'], ['20 Bags arrive', 'next'], ['21–23 Pack', 'next'], ['22–25 Ship', 'next']];
+const pillFor = (st) => 'display: inline-block; padding: 6px 12px; border-radius: 999px; font: 600 12px Instrument Sans, sans-serif; ' + (st === 'done' ? 'background: #17a05b; color: #ffffff' : st === 'now' ? 'background: #c22a1c; color: #ffffff' : 'background: #ffffff; color: #17130d; border: 2.5px solid #17130d');
+return {
+steps: S.map((s) => ({ label: s[0], style: pillFor(s[1]) })),
+kpis: [{ label: 'Active subscriptions', note: 'billed on the 5th', color: '#17130d' }, { label: 'Skipping this month', note: 'no bags ordered', color: '#8c8272' }, { label: 'Swaps requested', note: 'until preview deadline', color: '#f5a623' }, { label: 'Gift & one-off orders', note: 'this cycle', color: '#c22a1c' }, { label: 'Cancellations', note: 'this month', color: '#7a4a2b' }],
+orders: [{ roaster: 'Narcoffee Roasters', price: '[45] lei', status: 'Sent', pill: pillFor('done') }, { roaster: 'Yume Coffee Roasters', price: '[45] lei', status: 'To send', pill: pillFor('now') }, { roaster: 'MABÓ Coffee (alternate)', price: '[45] lei', status: 'To send', pill: pillFor('now') }, { roaster: 'Genus (house)', price: '[25] lei cost', status: 'Roast 18–20', pill: pillFor('next') }]
+};
+}
+}
+</script>
+</body>
+</html>
